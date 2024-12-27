@@ -2,15 +2,29 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 
+
+// Memoized selector
+const selectAuth = createSelector(
+  (state) => state.authReducer, // Access the authReducer state
+  (authReducer) => ({
+    isAuthenticated: authReducer?.isAuthenticated || false,
+    user: authReducer?.user || null,
+  })
+);
+
 const NavigationComponent = () => {
-  const { isAuthenticated = false, user = null } = useSelector((state) => state.authReducer || {});
+  // Use the memoized selector
+  const { isAuthenticated, user } = useSelector(selectAuth);
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
       <div className="container">
+        {/* Brand Name */}
         <Link className="navbar-brand ms-5" to="/">
           File Management System
         </Link>
+
+        {/* Navbar Toggle for Mobile */}
         <button
           className="navbar-toggler"
           type="button"
@@ -22,9 +36,12 @@ const NavigationComponent = () => {
         >
           <span className="navbar-toggler-icon"></span>
         </button>
+
+        {/* Navbar Links */}
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav ms-auto me-5">
             {isAuthenticated ? (
+              // Authenticated Navigation (Dashboard and Logout)
               <>
                 <li className="nav-item">
                   <Link className="btn btn-success btn-sm" to="/dashboard">
@@ -32,10 +49,13 @@ const NavigationComponent = () => {
                   </Link>
                 </li>
                 <li className="nav-item mx-2">
-                  <button className="btn btn-primary btn-sm">Logout</button>
+                  <button className="btn btn-danger btn-sm">
+                    Logout
+                  </button>
                 </li>
               </>
             ) : (
+              // Unauthenticated Navigation (Register and Login)
               <>
                 <li className="nav-item">
                   <Link className="btn btn-success btn-sm" to="/register">
