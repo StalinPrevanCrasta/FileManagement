@@ -3,8 +3,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFileAlt,faFileUpload, faFolderPlus } from "@fortawesome/free-solid-svg-icons";
 
 
-const SubBar = () => {
-    
+const SubBar = ({isCreateFolderModalOpen,setisCreateFolderModalOpen}) => {
+
   return (
       <nav className="navbar navbar-expand-lg navbar-light bg-white px-4">
         <p className=" ms-4">Root</p>
@@ -23,7 +23,7 @@ const SubBar = () => {
             </li>
             <li className="nav-items mx-2">
             
-                <button className="btn btn-outline-dark">
+                <button className="btn btn-outline-dark" onClick={()=>setisCreateFolderModalOpen(true)}>
                 <FontAwesomeIcon icon={faFolderPlus}/>&nbsp; Create Folder</button>
 
             </li>

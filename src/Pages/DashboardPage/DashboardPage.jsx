@@ -17,7 +17,8 @@ const DashboardPage = () => {
   return (
     <>
     <Navbar/>
-    <SubBar />
+    <SubBar isCreateFolderModalOpen={isCreateFolderModalOpen} 
+    setIsCreateFolderModalOpen={setIsCreateFolderModalOpen}  />
     <HomeComponents/>
     </>
     
