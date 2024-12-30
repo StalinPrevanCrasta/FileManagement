@@ -18,61 +18,66 @@ const addFile =(payload)=>({
 })
 
 // Create Folder
-export const createFolder = (data) => async (dispatch) => {
-  try {
-    dispatch(setLoading(true));
+export const createFolder = (data) => {
+  return async (dispatch) => {
+    try {
+      console.log("Dispatching createFolder with data:", data);
+      dispatch(setLoading(true));
 
-    // First check if folder exists
-    const foldersRef = fire.firestore().collection("folders");
-    const existingFolders = await foldersRef
-      .where("name", "==", data.name)
-      .where("parent", "==", data.parent)
-      .where("userId", "==", data.userId)
-      .get();
+      // First check if folder exists
+      const foldersRef = fire.firestore().collection("folders");
+      const existingFolders = await foldersRef
+        .where("name", "==", data.name)
+        .where("parent", "==", data.parent)
+        .where("userId", "==", data.userId)
+        .get();
 
-    if (!existingFolders.empty) {
+      if (!existingFolders.empty) {
+        dispatch(setLoading(false));
+        alert("Folder with this name already exists!");
+        return false;
+      }
+
+      // Create the folder data to be saved
+      const folderData = {
+        name: data.name,
+        userId: data.userId,
+        parent: data.parent, // This should be the folderId or "root"
+        createdAt: new Date(),
+      };
+
+      console.log("Saving folder with data:", folderData); // Debug log
+
+      // Add the folder to Firebase
+      const folderRef = await foldersRef.add(folderData);
+
+      // Create the folder data structure for Redux
+      const folderForRedux = {
+        data: folderData,
+        docId: folderRef.id,
+      };
+
+      // Dispatch to Redux store
+      dispatch({
+        type: types.CREATE_FOLDER,
+        payload: folderForRedux,
+      });
+
+      // Refresh folders
+      dispatch(getFolders(data.userId));
+      
       dispatch(setLoading(false));
-      alert("Folder with this name already exists!");
+      alert("Folder created successfully!");
+      dispatch({ type: "CREATE_FOLDER_SUCCESS", payload: folderForRedux });
+      return true;
+    } catch (error) {
+      console.error("Error in createFolder action:", error);
+      dispatch(setLoading(false));
+      alert("Error creating folder!");
+      dispatch({ type: "CREATE_FOLDER_FAILURE", payload: error });
       return false;
     }
-
-    // Create the folder data to be saved
-    const folderData = {
-      name: data.name,
-      userId: data.userId,
-      parent: data.parent, // This should be the folderId or "root"
-      createdAt: new Date(),
-    };
-
-    console.log("Saving folder with data:", folderData); // Debug log
-
-    // Add the folder to Firebase
-    const folderRef = await foldersRef.add(folderData);
-
-    // Create the folder data structure for Redux
-    const folderForRedux = {
-      data: folderData,
-      docId: folderRef.id,
-    };
-
-    // Dispatch to Redux store
-    dispatch({
-      type: types.CREATE_FOLDER,
-      payload: folderForRedux,
-    });
-
-    // Refresh folders
-    dispatch(getFolders(data.userId));
-    
-    dispatch(setLoading(false));
-    alert("Folder created successfully!");
-    return true;
-  } catch (error) {
-    console.error("Error creating folder:", error);
-    dispatch(setLoading(false));
-    alert("Error creating folder!");
-    return false;
-  }
+  };
 };
 
 // Get Folders
