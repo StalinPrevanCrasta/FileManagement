@@ -9,13 +9,10 @@ const ShowItems = ({ title, items, type }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   
-  // Function to handle double-click event
   const handleDbClick = (item) => {
     if (type === "folder") {
-      dispatch(changeFolder(item.userId));
-      // Navigate to folder and show the folder details with userId
-      navigate(`/dashboard/folder/${item.userId}`);  // You can pass `userId` if you want to show it in the URL or use it in another way
-      alert(`Folder clicked! User ID: ${item.userId}`);
+      dispatch(changeFolder(item.docId));
+      navigate(`/dashboard/folder/${item.docId}`);
     } else {
       alert("File clicked");
     }
@@ -23,9 +20,10 @@ const ShowItems = ({ title, items, type }) => {
 
   const iconTextStyle = {
     display: "flex",
+    flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
-    gap: "8px", // Adds spacing between the icon and text
+    gap: "8px",
   };
 
   return (
@@ -33,34 +31,31 @@ const ShowItems = ({ title, items, type }) => {
       <h4 className="text-center border-bottom py-2">{title}</h4>
       <div className="row gap-2 p-4 flex-wrap">
         {items.map((item, index) => {
-          // Log the item to check its structure
-          console.log("Item structure:", item);
-
-          // Get the name from the item (ensure the correct path based on the structure)
-          const itemName =
-            item.name || item.data?.name || item.fileName || `Unnamed ${type.charAt(0).toUpperCase() + type.slice(1)}`; // Fallback to "Unnamed Folder/File" if no name exists
-
-          // If name is missing, log the error and display a placeholder
-          if (!itemName || itemName.startsWith("Unnamed")) {
-            console.error("Missing folder or file name for item:", item);
-          }
-
-          // Use itemId or docId as a unique key
-          const itemId = item.docId || index; // Use item.docId if available, else fallback to index
+          const itemName = item.data?.name || item.name || `Unnamed ${type}`;
+          const itemId = item.docId || index;
 
           return (
             <div
-              key={itemId} // Use itemId as the key
-              className="col-md-2 py-3 text-center border d-flex flex-column align-items-center"
-              onDoubleClick={() => handleDbClick(item)} // Pass the entire item to the function
+              key={itemId}
+              className="col-md-2 py-3 text-center border rounded"
+              onDoubleClick={() => handleDbClick(item)}
+              style={{ cursor: "pointer" }}
             >
               <div style={iconTextStyle}>
                 {type === "folder" ? (
-                  <FontAwesomeIcon icon={faFolder} size="4x" className="mb-3" />
+                  <FontAwesomeIcon 
+                    icon={faFolder} 
+                    size="4x" 
+                    className="text-warning mb-2"
+                  />
                 ) : (
-                  <FontAwesomeIcon icon={faFileAlt} size="4x" className="mb-3" />
+                  <FontAwesomeIcon 
+                    icon={faFileAlt} 
+                    size="4x" 
+                    className="mb-2"
+                  />
                 )}
-                <span>{itemName}</span> {/* Display folder/file name */}
+                <span className="mt-2">{itemName}</span>
               </div>
             </div>
           );

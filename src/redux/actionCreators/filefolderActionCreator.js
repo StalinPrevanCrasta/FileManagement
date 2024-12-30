@@ -1,70 +1,98 @@
-import * as types from "../actionsTypes/filefolderActionTypes"; // Corrected spelling from 'tyoes' to 'types'
+import * as types from "../actionsTypes/filefolderActionTypes";
 import fire from "../../config/firebase";
 
-// Action to add a folder
-const addFolder = (payload) => ({
-  type: types.CREATE_FOLDER, // Using the correct action type from the action types file
-  payload,
+// Set Loading
+const setLoading = (status) => ({
+  type: types.SET_LOADING,
+  payload: status,
 });
 
-const addFolders = (payload) => ({
-  type: types.ADD_FOLDER, // Using the correct action type from the action types file
-  payload,
-});
+// Create Folder
+export const createFolder = (data) => async (dispatch) => {
+  try {
+    dispatch(setLoading(true));
 
-const setLoading = (payload) => ({
-  type: types.SET_LOADING, // Using the correct action type from the action types file
-  payload,
-});
-const setchangeFolder = (payload) => ({
-  type: types.CHANGE_FOLDER, // Using the correct action type from the action types file
-  payload,
-});
+    // First check if folder exists
+    const foldersRef = fire.firestore().collection("folders");
+    const existingFolders = await foldersRef
+      .where("name", "==", data.name)
+      .where("parent", "==", data.parent)
+      .where("userId", "==", data.userId)
+      .get();
 
+    if (!existingFolders.empty) {
+      dispatch(setLoading(false));
+      alert("Folder with this name already exists!");
+      return false;
+    }
 
-// Action creator to create a folder
-export const createFolder = (data) => (dispatch) => {
-  dispatch(setLoading(true)); // Optional: Set loading state for folder creation
+    // Create the folder data to be saved
+    const folderData = {
+      name: data.name,
+      userId: data.userId,
+      parent: data.parent, // This should be the folderId or "root"
+      createdAt: new Date(),
+    };
 
-  fire
-    .firestore()
-    .collection("folders")
-    .add(data)
-    .then((folder) => {
-      folder.get().then((doc) => {
-        const folderData = doc.data();
-        dispatch(addFolder(folderData)); // Dispatch action after successful folder creation
-        dispatch(setLoading(false)); // End loading after folder creation
-        alert("Folder created successfully!");
-      });
-    })
-    .catch((error) => {
-      console.error("Error creating folder: ", error);
-      dispatch(setLoading(false)); // End loading in case of error
-      alert("Failed to create folder. Please try again.");
+    console.log("Saving folder with data:", folderData); // Debug log
+
+    // Add the folder to Firebase
+    const folderRef = await foldersRef.add(folderData);
+
+    // Create the folder data structure for Redux
+    const folderForRedux = {
+      data: folderData,
+      docId: folderRef.id,
+    };
+
+    // Dispatch to Redux store
+    dispatch({
+      type: types.CREATE_FOLDER,
+      payload: folderForRedux,
     });
+
+    // Refresh folders
+    dispatch(getFolders(data.userId));
+    
+    dispatch(setLoading(false));
+    alert("Folder created successfully!");
+    return true;
+  } catch (error) {
+    console.error("Error creating folder:", error);
+    dispatch(setLoading(false));
+    alert("Error creating folder!");
+    return false;
+  }
 };
 
-// Action creator to fetch folders
-export const getFolders = (userId) => (dispatch) => {
-  dispatch(setLoading(true)); // Set loading state when fetching folders
+// Get Folders
+export const getFolders = (userId) => async (dispatch) => {
+  try {
+    dispatch(setLoading(true));
+    const folders = await fire
+      .firestore()
+      .collection("folders")
+      .where("userId", "==", userId)
+      .get();
 
-  fire
-    .firestore()
-    .collection("folders")
-    .where("userId", "==", userId)
-    .get()
-    .then((folders) => {
-      const foldersData = folders.docs.map((folder) => folder.data());
-      dispatch(addFolders(foldersData)); // Dispatch action with fetched folder data
-      dispatch(setLoading(false)); // End loading after data is fetched
-    })
-    .catch((error) => {
-      console.error("Error fetching folders: ", error);
-      dispatch(setLoading(false)); // End loading in case of error
-      alert("Failed to fetch folders. Please try again.");
+    const foldersData = folders.docs.map(folder => ({
+      data: folder.data(),
+      docId: folder.id,
+    }));
+
+    dispatch({
+      type: types.GET_FOLDERS,
+      payload: foldersData,
     });
+    dispatch(setLoading(false));
+  } catch (error) {
+    console.error("Error getting folders:", error);
+    dispatch(setLoading(false));
+  }
 };
-export const changeFolder = (folder) => (dispatch) => {
-  dispatch(setchangeFolder(folder)); // Dispatch action to change folder
-}
+
+// Change Folder
+export const changeFolder = (folderId) => ({
+  type: types.CHANGE_FOLDER,
+  payload: folderId,
+});
