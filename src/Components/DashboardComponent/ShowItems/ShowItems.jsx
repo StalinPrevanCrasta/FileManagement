@@ -38,10 +38,10 @@ const ShowItems = ({ title, items, type }) => {
 
           // Get the name from the item (ensure the correct path based on the structure)
           const itemName =
-            item.name || item.data?.name || item.fileName || "Unnamed Item"; // Fallback to "Unnamed Item" if no name exists
+            item.name || item.data?.name || item.fileName || `Unnamed ${type.charAt(0).toUpperCase() + type.slice(1)}`; // Fallback to "Unnamed Folder/File" if no name exists
 
           // If name is missing, log the error and display a placeholder
-          if (!itemName || itemName === "Unnamed Item") {
+          if (!itemName || itemName.startsWith("Unnamed")) {
             console.error("Missing folder or file name for item:", item);
           }
 
@@ -49,7 +49,7 @@ const ShowItems = ({ title, items, type }) => {
           const itemId = item.docId || index; // Use item.docId if available, else fallback to index
 
           return (
-            <p
+            <div
               key={itemId} // Use itemId as the key
               className="col-md-2 py-3 text-center border d-flex flex-column align-items-center"
               onDoubleClick={() => handleDbClick(item)} // Pass the entire item to the function
@@ -62,7 +62,7 @@ const ShowItems = ({ title, items, type }) => {
                 )}
                 <span>{itemName}</span> {/* Display folder/file name */}
               </div>
-            </p>
+            </div>
           );
         })}
       </div>

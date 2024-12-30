@@ -16,7 +16,10 @@ const HomeComponents = () => {
     : []; // Use Map to ensure unique folder names
 
   // Example files data
-  const files = ["New File", "New File 2"];
+  const files = [
+    { name: "New File", userId: "1" },
+    { name: "New File 2", userId: "2" }
+  ];
 
   return (
     <div className="col-md-12 w-100">

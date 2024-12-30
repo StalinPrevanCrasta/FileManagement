@@ -1,35 +1,33 @@
 import { shallowEqual, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import { useMemo } from "react";
 
 const FolderComponent = () => {
   const { folderId } = useParams(); // Get folderId from the URL
 
-  // Fetch currentFolderData and childFolders using useSelector
-  const { currentFolderData, childFolders } = useSelector(
-    (state) => ({
-      currentFolderData: state.filefolders.userFolders.find(
-        (folder) => folder.docId === folderId // Find the folder with the matching folderId
-      )?.data,
-      childFolders: state.filefolders.userFolders.filter(
-        (folder) => folder.parent === folderId // Get child folders with matching parent folderId
-      ),
-    }),
+  // Fetch userFolders using useSelector
+  const userFolders = useSelector(
+    (state) => state.filefolders.userFolders,
     shallowEqual
   );
+
+  // Memoize childFolders to prevent unnecessary re-renders
+  const childFolders = useMemo(() => {
+    return userFolders.filter((folder) => folder.parent === folderId);
+  }, [userFolders, folderId]);
 
   console.log("Folder ID from URL:", folderId); // Debugging folder ID
 
   return (
     <div>
       {childFolders.length > 0 ? (
-        <p>
-          {JSON.stringify(childFolders)}
-        </p>
+        <div>
+          <p>{JSON.stringify(childFolders)}</p>
+        </div>
       ) : (
         <p className="text-center my-5">Empty Folder</p>
       )}
       {/* Display folder details */}
-      )
     </div>
   );
 };

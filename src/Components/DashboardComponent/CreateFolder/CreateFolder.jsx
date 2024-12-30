@@ -1,43 +1,47 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import { useSelector, shallowEqual, useDispatch } from "react-redux";
 import { createFolder } from "../../../redux/actionCreators/filefolderActionCreator";
+import PropTypes from 'prop-types';
+import fire from "../../../config/firebase";
 
 const CreateFolder = ({ setIsCreateFolderModalOpen }) => {
   const [folderName, setFolderName] = useState("");
 
-  // Access user folders from Redux store
-  const { userFolders = [], user, currentFolder = "root", currentFolderData } = useSelector(
+  const { user, currentFolder = "root", currentFolderData } = useSelector(
     (state) => ({
-      userFolders: state.filefolder?.userFolders || [], // Ensure userFolders defaults to an empty array if undefined
       user: state.auth?.user,
-      currentFolder: state.filefolder?.currentFolder || "root", // Default to "root" if currentFolder is undefined
+      currentFolder: state.filefolder?.currentFolder || "root",
       currentFolderData: state.filefolder?.userFolders?.find(
         (folder) => folder.docId === state.filefolder?.currentFolder
-      ), // Get data for the current folder
+      ),
     }),
     shallowEqual
   );
 
   const dispatch = useDispatch();
 
-  // Check if the folder already exists in the current folder
-  const checkFolderAlreadyPresent = (name) => {
-    return userFolders.some(
-      (folder) => folder.data.parent === currentFolder && folder.data.name === name
-    );
+  const checkFolderAlreadyPresentInFirebase = async (name) => {
+    const foldersRef = fire.firestore().collection('folders');
+    const querySnapshot = await foldersRef
+      .where('userId', '==', user.uid)
+      .where('name', '==', name)
+      .where('parent', '==', currentFolder)
+      .get();
+
+    return !querySnapshot.empty;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const trimmedFolderName = folderName.trim(); // Remove extra spaces
+    const trimmedFolderName = folderName.trim();
 
     if (trimmedFolderName) {
       if (trimmedFolderName.length > 3) {
-        if (!checkFolderAlreadyPresent(trimmedFolderName)) {
-          // Folder doesn't exist; proceed with creation
+        const folderExists = await checkFolderAlreadyPresentInFirebase(trimmedFolderName);
+        if (!folderExists) {
           const data = {
             createsAt: new Date(),
             name: trimmedFolderName,
@@ -51,18 +55,18 @@ const CreateFolder = ({ setIsCreateFolderModalOpen }) => {
             lastAccessed: null,
             updatedAt: new Date(),
           };
-          dispatch(createFolder(data)); // Dispatch action to create folder
-          alert(`Folder "${trimmedFolderName}" created successfully.`); // Success message
-          setFolderName(""); // Clear input field
-          setIsCreateFolderModalOpen(false); // Close modal
+          dispatch(createFolder(data));
+          alert(`Folder "${trimmedFolderName}" created successfully.`);
+          setFolderName("");
+          setIsCreateFolderModalOpen(false);
         } else {
-          alert(`Folder "${trimmedFolderName}" already exists!`); // Alert for duplicate folder
+          alert(`Folder "${trimmedFolderName}" already exists!`);
         }
       } else {
-        alert("Folder name must be at least 4 characters long."); // Minimum length validation
+        alert("Folder name must be at least 4 characters long.");
       }
     } else {
-      alert("Folder name cannot be empty!"); // Empty input validation
+      alert("Folder name cannot be empty!");
     }
   };
 
@@ -107,6 +111,10 @@ const CreateFolder = ({ setIsCreateFolderModalOpen }) => {
       </div>
     </div>
   );
+};
+
+CreateFolder.propTypes = {
+  setIsCreateFolderModalOpen: PropTypes.func.isRequired,
 };
 
 export default CreateFolder;
