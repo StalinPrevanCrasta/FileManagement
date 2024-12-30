@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { createFolder } from "../../../redux/actionCreators/filefolderActionCreator";
 import { useNavigate, useParams } from "react-router-dom";
@@ -7,34 +7,27 @@ const CreateFolder = () => {
   const [folderName, setFolderName] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { folderId } = useParams(); // Get the folderId from params
-
-  // Get current user from Redux state
-  const { user } = useSelector(state => state.auth);
+  const { folderId } = useParams(); 
+  const { user } = useSelector((state) => state.auth);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (folderName.trim()) {
-      // Create folder data with the correct parent
       const data = {
         name: folderName.trim(),
         userId: user.uid,
-        parent: folderId || "root", // Ensure the parent is set to the correct folderId
+        parent: folderId || "root", // Ensure parent is set to folderId if available
         createdAt: new Date(),
       };
 
-      console.log("Creating folder with data:", data); // Debug log
+      console.log("Creating folder with data:", data);
 
       try {
         const success = dispatch(createFolder(data));
         if (success) {
           setFolderName("");
-          // Navigate to the current folder (or back to root if no folderId)
-          if (folderId) {
-            navigate(`/dashboard/folder/${folderId}`);
-          } else {
-            navigate("/dashboard"); // If no folderId, go to the root dashboard
-          }
+          // Navigate back to the current folder
+          navigate(folderId ? `/dashboard/folder/${folderId}` : "/dashboard");
         }
       } catch (error) {
         console.error("Error creating folder:", error);
@@ -66,10 +59,10 @@ const CreateFolder = () => {
           <button type="submit" className="btn btn-primary mx-2">
             Create Folder
           </button>
-          <button 
-            type="button" 
+          <button
+            type="button"
             className="btn btn-secondary mx-2"
-            onClick={() => navigate(-1)} // Go back to previous page
+            onClick={() => navigate(-1)}
           >
             Cancel
           </button>
