@@ -1,30 +1,43 @@
 import { shallowEqual, useSelector } from "react-redux";
+import { createSelector } from "reselect";
+import  { useMemo } from "react"; 
 import ShowItems from "../ShowItems/ShowItems";
+
+// Memoized selector for folders and files
+const selectFileFolders = (state) => state.filefolders;
+
+const makeSelectDerivedData = createSelector(
+  [selectFileFolders],
+  (filefolders) => ({
+    isLoading: filefolders.isLoading,
+    userFolders: filefolders.userFolders.filter(
+      (folder) => folder.data && folder.data.parent === "root"
+    ),
+    userFiles: filefolders.userFiles.filter(
+      (file) => file.data && file.data.parent === "root"
+    ),
+  })
+);
 
 const HomeComponents = () => {
   const { isLoading, userFolders, userFiles } = useSelector(
-    (state) => ({
-      isLoading: state.filefolders.isLoading,
-      userFolders: state.filefolders.userFolders.filter(
-        (folder) => folder.data && folder.data.parent === "root"
-      ),
-      userFiles: state.filefolders.userFiles.filter(
-        (file) => file.data && file.data.parent === "root"
-      ),
-    }),
+    makeSelectDerivedData,
     shallowEqual
   );
 
-  const uniqueFolders = userFolders
-    ? userFolders.map(folder => ({
+  // Mapping uniqueFolders, memoized to avoid recomputation
+  const uniqueFolders = useMemo(
+    () =>
+      userFolders.map((folder) => ({
         docId: folder.docId,
         data: folder.data,
         name: folder.data.name,
         userId: folder.data.userId,
         createdAt: folder.data.createdAt,
-        parent: folder.data.parent
-      }))
-    : [];
+        parent: folder.data.parent,
+      })),
+    [userFolders]
+  );
 
   return (
     <div className="col-md-12 w-100">
