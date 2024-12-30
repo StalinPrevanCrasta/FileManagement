@@ -8,8 +8,8 @@ const FolderComponent = () => {
   const { currentFolderData, childFolders } = useSelector(
     (state) => ({
       currentFolderData: state.filefolders.userFolders.find(
-        (folder) => folder.userId === folderId // Find the folder with the matching folderId
-      ),
+        (folder) => folder.docId === folderId // Find the folder with the matching folderId
+      )?.data,
       childFolders: state.filefolders.userFolders.filter(
         (folder) => folder.parent === folderId // Get child folders with matching parent folderId
       ),

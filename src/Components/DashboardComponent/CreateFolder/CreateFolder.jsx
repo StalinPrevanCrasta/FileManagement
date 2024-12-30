@@ -3,36 +3,31 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import { useSelector, shallowEqual, useDispatch } from "react-redux";
 import { createFolder } from "../../../redux/actionCreators/filefolderActionCreator";
-import { current } from "@reduxjs/toolkit";
 
 const CreateFolder = ({ setIsCreateFolderModalOpen }) => {
   const [folderName, setFolderName] = useState("");
 
   // Access user folders from Redux store
-  const { userFolders = [], user, currentFolder = "root" } = useSelector(
+  const { userFolders = [], user, currentFolder = "root", currentFolderData } = useSelector(
     (state) => ({
-      userFolders: state.filefolder?.userFolders || [],
+      userFolders: state.filefolder?.userFolders || [], // Ensure userFolders defaults to an empty array if undefined
       user: state.auth?.user,
-      currentFolder: state.filefolder?.currentFolder || "root",
+      currentFolder: state.filefolder?.currentFolder || "root", // Default to "root" if currentFolder is undefined
+      currentFolderData: state.filefolder?.userFolders?.find(
+        (folder) => folder.docId === state.filefolder?.currentFolder
+      ), // Get data for the current folder
     }),
     shallowEqual
   );
+
   const dispatch = useDispatch();
 
-  // Check if the folder already exists
+  // Check if the folder already exists in the current folder
   const checkFolderAlreadyPresent = (name) => {
-    const folderPresent = userFolders.filter(
-      (folder) => folder.parent === currentFolder
-    ).find((folder) => folder.name === name);
-    if (folderPresent !== undefined || folderPresent !== null) {
-      return true;
-
-    } else {
-      return false;
-    }
-      
-     
-    };
+    return userFolders.some(
+      (folder) => folder.data.parent === currentFolder && folder.data.name === name
+    );
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -48,7 +43,10 @@ const CreateFolder = ({ setIsCreateFolderModalOpen }) => {
             name: trimmedFolderName,
             userId: user.uid,
             createdBy: user.displayName,
-            path: currentFolder === "root" ? [] : ["parent folder path!"],
+            path:
+              currentFolder === "root"
+                ? []
+                : [...(currentFolderData?.data.path || []), currentFolder],
             parent: currentFolder,
             lastAccessed: null,
             updatedAt: new Date(),
