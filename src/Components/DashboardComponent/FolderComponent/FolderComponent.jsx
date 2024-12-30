@@ -1,7 +1,9 @@
 import { useParams } from "react-router-dom";
 
 const FolderComponent = () => {
-  const { folderId } = useParams(); // Fetch folderId from the URL
+  const { folderId } = useParams(); // Get folderId from the URL
+
+  console.log("Folder ID from URL:", folderId); // Debugging folder ID
 
   return (
     <div>
