@@ -1,6 +1,9 @@
+// authActionCreators.js
+
 import * as types from "../actionsTypes/authActionTypes";
 import fire from "../../config/firebase";
 
+// Action to log in user
 const loginUser = (payload) => {
   return {
     type: types.SIGN_IN,
@@ -8,10 +11,18 @@ const loginUser = (payload) => {
   };
 };
 
+// Action to log out user
 const logOutUser = () => {
   return {
     type: types.SIGN_OUT,
   };
+};
+
+// Utility function to handle success/failure updates
+const handleSuccess = (setSuccess, success) => {
+  if (typeof setSuccess === "function") {
+    setSuccess(success);
+  }
 };
 
 // Action creators
@@ -27,12 +38,12 @@ export const signInUser = (email, password, setSuccess) => (dispatch) => {
           displayName: user.user.displayName,
         })
       );
-      if (typeof setSuccess === "function") setSuccess(true); // Safeguard
+      handleSuccess(setSuccess, true); // Safeguard
     })
     .catch((error) => {
       alert("Invalid email or password");
       console.error(error);
-      if (typeof setSuccess === "function") setSuccess(false); // Safeguard
+      handleSuccess(setSuccess, false); // Safeguard
     });
 };
 
@@ -52,25 +63,30 @@ export const signUpUser = (name, email, password, setSuccess) => (dispatch) => {
               displayName: user.displayName,
             })
           );
-          if (typeof setSuccess === "function") setSuccess(true); // Safeguard
+          handleSuccess(setSuccess, true); // Safeguard
         })
         .catch((error) => {
           console.error("Error updating profile:", error);
-          if (typeof setSuccess === "function") setSuccess(false); // Safeguard
+          handleSuccess(setSuccess, false); // Safeguard
         });
     })
     .catch((error) => {
-      if (error.code === "auth/email-already-in-use") {
-        alert("The email address is already in use by another account.");
-      } else if (error.code === "auth/invalid-email") {
-        alert("Invalid email address.");
-      } else if (error.code === "auth/weak-password") {
-        alert("Password is too weak.");
-      } else {
-        alert("Error signing up. Please try again.");
+      switch (error.code) {
+        case "auth/email-already-in-use":
+          alert("The email address is already in use by another account.");
+          break;
+        case "auth/invalid-email":
+          alert("Invalid email address.");
+          break;
+        case "auth/weak-password":
+          alert("Password is too weak.");
+          break;
+        default:
+          alert("Error signing up. Please try again.");
+          break;
       }
       console.error(error);
-      if (typeof setSuccess === "function") setSuccess(false); // Safeguard
+      handleSuccess(setSuccess, false); // Safeguard
     });
 };
 
@@ -80,9 +96,13 @@ export const signOut = () => (dispatch) => {
     .signOut()
     .then(() => {
       dispatch(logOutUser());
+    })
+    .catch((error) => {
+      console.error("Error signing out:", error);
     });
-  dispatch(logOutUser());
 };
+
+// Check if user is logged in and update state
 export const checkIsLoggedIn = () => (dispatch) => {
   fire.auth().onAuthStateChanged((user) => {
     if (user) {

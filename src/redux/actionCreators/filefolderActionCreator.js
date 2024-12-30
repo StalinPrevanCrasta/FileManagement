@@ -6,116 +6,86 @@ const setLoading = (status) => ({
   type: types.SET_LOADING,
   payload: status,
 });
-//files
+
+// Add File to Redux
+const addFile = (payload) => ({
+  type: types.CREATE_FILE,
+  payload,
+});
+
+// Add Files to Redux
 const addFiles = (payload) => ({
-  type:types.ADD_FILE,
+  type: types.ADD_FILE,
   payload,
+});
 
-})
-const addFile =(payload)=>({
-  type:types.CREATE_FILE,
-  payload,
-})
-
-// Create Folder
-export const createFolder = (data) => {
-  return async (dispatch) => {
-    try {
-      console.log("Dispatching createFolder with data:", data);
-      dispatch(setLoading(true));
-
-      // First check if folder exists
-      const foldersRef = fire.firestore().collection("folders");
-      const existingFolders = await foldersRef
-        .where("name", "==", data.name)
-        .where("parent", "==", data.parent)
-        .where("userId", "==", data.userId)
-        .get();
-
-      if (!existingFolders.empty) {
-        dispatch(setLoading(false));
-        alert("Folder with this name already exists!");
-        return false;
-      }
-
-      // Create the folder data to be saved
-      const folderData = {
-        name: data.name,
-        userId: data.userId,
-        parent: data.parent, // This should be the folderId or "root"
-        createdAt: new Date(),
-      };
-
-      console.log("Saving folder with data:", folderData); // Debug log
-
-      // Add the folder to Firebase
-      const folderRef = await foldersRef.add(folderData);
-
-      // Create the folder data structure for Redux
-      const folderForRedux = {
-        data: folderData,
-        docId: folderRef.id,
-      };
-
-      // Dispatch to Redux store
-      dispatch({
-        type: types.CREATE_FOLDER,
-        payload: folderForRedux,
-      });
-
-      // Refresh folders
-      dispatch(getFolders(data.userId));
-      
-      dispatch(setLoading(false));
-      alert("Folder created successfully!");
-      dispatch({ type: "CREATE_FOLDER_SUCCESS", payload: folderForRedux });
-      return true;
-    } catch (error) {
-      console.error("Error in createFolder action:", error);
-      dispatch(setLoading(false));
-      alert("Error creating folder!");
-      dispatch({ type: "CREATE_FOLDER_FAILURE", payload: error });
-      return false;
-    }
-  };
-};
-
-// Get Folders
-export const getFolders = (userId) => async (dispatch) => {
+// Get Files
+export const getFiles = (userId) => async (dispatch) => {
   try {
     dispatch(setLoading(true));
-    const folders = await fire
-      .firestore()
-      .collection("folders")
-      .where("userId", "==", userId)
-      .get();
 
-    const foldersData = folders.docs.map(folder => ({
-      data: folder.data(),
-      docId: folder.id,
+    const filesRef = fire.firestore().collection("files");
+    const files = await filesRef.where("userId", "==", userId).get();
+
+    const filesData = files.docs.map((file) => ({
+      data: file.data(),
+      docId: file.id,
     }));
 
     dispatch({
-      type: types.GET_FOLDERS,
-      payload: foldersData,
+      type: types.GET_FILES,
+      payload: filesData,
     });
     dispatch(setLoading(false));
   } catch (error) {
-    console.error("Error getting folders:", error);
-    dispatch(setLoading(false));
+    console.error("Error getting files:", error);
+    
+    dispatch(addFiles(filesData));
   }
 };
 
-// Change Folder
-export const changeFolder = (folderId) => ({
-  type: types.CHANGE_FOLDER,
-  payload: folderId,
-});
+// Create File
+export const createFile = (data, setSuccess) => async (dispatch) => {
+  try {
+    dispatch(setLoading(true));
 
-//files
- export const getFiles = (userId) => (dispatch) =>{
-  console.log,og(userId);
- }
- export const createFile =(data) => (dispatch) =>{
-    console.log(data);
- }
+    const filesRef = fire.firestore().collection("files");
+
+    // Check if the file already exists in the same folder for the user
+    const existingFiles = await filesRef
+      .where("name", "==", data.name)
+      .where("parent", "==", data.parent)
+      .where("userId", "==", data.userId)
+      .get();
+
+    if (!existingFiles.empty) {
+      alert("A file with this name already exists in the current folder.");
+      dispatch(setLoading(false));
+      setSuccess(false);
+      return;
+    }
+
+    // Add the file to Firebase
+    const fileRef = await filesRef.add(data);
+
+    // Fetch the newly created file data from Firebase
+    const fileData = await fileRef.get();
+
+    const newFile = {
+      data: fileData.data(),
+      docId: fileRef.id,
+    };
+
+    // Dispatch to Redux store
+    dispatch(addFile(newFile));
+
+    alert("File created successfully!");
+    setSuccess(true);
+    dispatch(setLoading(false));
+  } catch (error) {
+    console.error("Error creating file:", error);
+    alert("Error creating file. Please try again.");
+    setSuccess(false);
+    dispatch(setLoading(false));
+  }
+};

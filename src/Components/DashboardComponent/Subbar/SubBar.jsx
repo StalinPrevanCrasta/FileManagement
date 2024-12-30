@@ -6,7 +6,7 @@ import { faFileAlt, faFileUpload, faFolderPlus } from "@fortawesome/free-solid-s
 import { useSelector } from "react-redux";
 import CreateFolder from "../CreateFolder/CreateFolder";
 
-const SubBar = () => {
+const SubBar = ({setIsCreateFileModalOpen}) => {
   const location = useLocation();
   const { folderId } = useParams();
   const [isCreateFolderModalOpen, setIsCreateFolderModalOpen] = useState(false);
@@ -41,7 +41,9 @@ const SubBar = () => {
             </button>
           </li>
           <li className="nav-item mx-2">
-            <button className="btn btn-outline-dark">
+            <button className="btn btn-outline-dark"
+            onClick={() => setIsCreateFileModalOpen(true)}>
+              
               <FontAwesomeIcon icon={faFileAlt} />
               &nbsp; Create File
             </button>
