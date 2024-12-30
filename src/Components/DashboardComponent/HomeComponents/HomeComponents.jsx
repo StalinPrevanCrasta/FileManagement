@@ -1,6 +1,6 @@
 import { shallowEqual, useSelector } from "react-redux";
 import { createSelector } from "reselect";
-import  { useMemo } from "react"; 
+import { useMemo } from "react"; 
 import ShowItems from "../ShowItems/ShowItems";
 
 // Memoized selector for folders and files
