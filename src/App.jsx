@@ -1,5 +1,7 @@
 import './App.css';
 import { useEffect } from 'react';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import { Route, Routes } from "react-router-dom";
 import  {Login, Register, Homepage, DashboardPage} from './Pages';
@@ -21,6 +23,7 @@ const App = () => {
         <Route path="/register" element={<Register/>}/>
         <Route path="/dashboard/*" element={<DashboardPage/>}/>
       </Routes>
+      <ToastContainer />
     </div>
   );
 };

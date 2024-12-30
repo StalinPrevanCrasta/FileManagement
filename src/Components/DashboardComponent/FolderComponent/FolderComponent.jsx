@@ -1,33 +1,43 @@
-import { shallowEqual, useSelector } from "react-redux";
+import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { useMemo } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { changeFolder } from "../../../redux/actionCreators/filefolderActionCreator";
+import ShowItems from "../ShowItems/ShowItems";
 
 const FolderComponent = () => {
-  const { folderId } = useParams(); // Get folderId from the URL
+  const { folderId } = useParams();
+  const dispatch = useDispatch();
 
-  // Fetch userFolders using useSelector
-  const userFolders = useSelector(
-    (state) => state.filefolders.userFolders,
-    shallowEqual
-  );
+  const { userFolders, userFiles } = useSelector((state) => state.filefolders);
 
-  // Memoize childFolders to prevent unnecessary re-renders
-  const childFolders = useMemo(() => {
-    return userFolders.filter((folder) => folder.parent === folderId);
-  }, [userFolders, folderId]);
+  useEffect(() => {
+    if (folderId) {
+      dispatch(changeFolder(folderId));
+    }
+  }, [folderId, dispatch]);
 
-  console.log("Folder ID from URL:", folderId); // Debugging folder ID
+  // Get only the folders that belong to the current folder
+  const childFolders = userFolders.filter(folder => {
+    return folder.data && folder.data.parent === folderId;
+  });
+
+  // Get only the files that belong to the current folder
+  const childFiles = userFiles.filter(
+    file => file.data && file.data.parent === folderId
+  ) || [];
 
   return (
-    <div>
-      {childFolders.length > 0 ? (
-        <div>
-          <p>{JSON.stringify(childFolders)}</p>
-        </div>
-      ) : (
-        <p className="text-center my-5">Empty Folder</p>
-      )}
-      {/* Display folder details */}
+    <div className="col-md-12 w-100">
+      <ShowItems
+        title={"Folders"}
+        type={"folder"}
+        items={childFolders}
+      />
+      <ShowItems
+        title={"Files"}
+        type={"file"}
+        items={childFiles}
+      />
     </div>
   );
 };

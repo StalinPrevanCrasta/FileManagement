@@ -1,120 +1,82 @@
-import { useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTimes } from "@fortawesome/free-solid-svg-icons";
-import { useSelector, shallowEqual, useDispatch } from "react-redux";
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { createFolder } from "../../../redux/actionCreators/filefolderActionCreator";
-import PropTypes from 'prop-types';
-import fire from "../../../config/firebase";
+import { useNavigate, useParams } from "react-router-dom";
 
-const CreateFolder = ({ setIsCreateFolderModalOpen }) => {
+const CreateFolder = () => {
   const [folderName, setFolderName] = useState("");
-
-  const { user, currentFolder = "root", currentFolderData } = useSelector(
-    (state) => ({
-      user: state.auth?.user,
-      currentFolder: state.filefolder?.currentFolder || "root",
-      currentFolderData: state.filefolder?.userFolders?.find(
-        (folder) => folder.docId === state.filefolder?.currentFolder
-      ),
-    }),
-    shallowEqual
-  );
-
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { folderId } = useParams(); // Get the folderId from params
 
-  const checkFolderAlreadyPresentInFirebase = async (name) => {
-    const foldersRef = fire.firestore().collection('folders');
-    const querySnapshot = await foldersRef
-      .where('userId', '==', user.uid)
-      .where('name', '==', name)
-      .where('parent', '==', currentFolder)
-      .get();
+  // Get current user from Redux state
+  const { user } = useSelector(state => state.auth);
 
-    return !querySnapshot.empty;
-  };
-
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
+    if (folderName.trim()) {
+      // Create folder data with the correct parent
+      const data = {
+        name: folderName.trim(),
+        userId: user.uid,
+        parent: folderId || "root", // Ensure the parent is set to the correct folderId
+        createdAt: new Date(),
+      };
 
-    const trimmedFolderName = folderName.trim();
+      console.log("Creating folder with data:", data); // Debug log
 
-    if (trimmedFolderName) {
-      if (trimmedFolderName.length > 3) {
-        const folderExists = await checkFolderAlreadyPresentInFirebase(trimmedFolderName);
-        if (!folderExists) {
-          const data = {
-            createsAt: new Date(),
-            name: trimmedFolderName,
-            userId: user.uid,
-            createdBy: user.displayName,
-            path:
-              currentFolder === "root"
-                ? []
-                : [...(currentFolderData?.data.path || []), currentFolder],
-            parent: currentFolder,
-            lastAccessed: null,
-            updatedAt: new Date(),
-          };
-          dispatch(createFolder(data));
-          alert(`Folder "${trimmedFolderName}" created successfully.`);
+      try {
+        const success = dispatch(createFolder(data));
+        if (success) {
           setFolderName("");
-          setIsCreateFolderModalOpen(false);
-        } else {
-          alert(`Folder "${trimmedFolderName}" already exists!`);
+          // Navigate to the current folder (or back to root if no folderId)
+          if (folderId) {
+            navigate(`/dashboard/folder/${folderId}`);
+          } else {
+            navigate("/dashboard"); // If no folderId, go to the root dashboard
+          }
         }
-      } else {
-        alert("Folder name must be at least 4 characters long.");
+      } catch (error) {
+        console.error("Error creating folder:", error);
+        alert("Error creating folder. Please try again.");
       }
     } else {
-      alert("Folder name cannot be empty!");
+      alert("Please enter a folder name");
     }
   };
 
   return (
-    <div
-      className="col-md-12 position-fixed top-0 left-0 w-100 h-100"
-      style={{ background: "rgba(0,0,0,0.4)", zIndex: 9999 }}
-    >
-      <div className="row align-items-center justify-content-center">
-        <div className="col-md-4 mt-5 bg-white p-4">
-          <div className="d-flex justify-content-between">
-            <h4>Create Folder</h4>
-            <button
-              className="btn"
-              onClick={() => setIsCreateFolderModalOpen(false)}
-            >
-              <FontAwesomeIcon icon={faTimes} className="text-black" size="sm" />
-            </button>
-          </div>
-          <hr />
-          <div className="d-flex flex-column align-items-center">
-            <form className="mt-3 w-100" onSubmit={handleSubmit}>
-              <div className="form-group">
-                <input
-                  type="text"
-                  className="form-control"
-                  id="folderName"
-                  placeholder="Folder Name"
-                  value={folderName}
-                  onChange={(e) => setFolderName(e.target.value)}
-                />
-              </div>
-              <button
-                type="submit"
-                className="btn btn-primary mt-5 form-control"
-              >
-                Create Folder
-              </button>
-            </form>
-          </div>
+    <div className="col-md-12 p-3">
+      <h4 className="text-center mb-4">
+        Create New Folder {folderId ? `in Folder ${folderId}` : "in Root"}
+      </h4>
+      <form onSubmit={handleSubmit} className="w-50 mx-auto">
+        <div className="form-group">
+          <input
+            type="text"
+            className="form-control"
+            id="folderName"
+            placeholder="Enter Folder Name"
+            value={folderName}
+            onChange={(e) => setFolderName(e.target.value)}
+            autoFocus
+          />
         </div>
-      </div>
+        <div className="text-center mt-3">
+          <button type="submit" className="btn btn-primary mx-2">
+            Create Folder
+          </button>
+          <button 
+            type="button" 
+            className="btn btn-secondary mx-2"
+            onClick={() => navigate(-1)} // Go back to previous page
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
     </div>
   );
-};
-
-CreateFolder.propTypes = {
-  setIsCreateFolderModalOpen: PropTypes.func.isRequired,
 };
 
 export default CreateFolder;

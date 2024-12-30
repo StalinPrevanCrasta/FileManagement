@@ -2,24 +2,29 @@ import { shallowEqual, useSelector } from "react-redux";
 import ShowItems from "../ShowItems/ShowItems";
 
 const HomeComponents = () => {
-  const { isLoading, userFolders } = useSelector(
+  const { isLoading, userFolders, userFiles } = useSelector(
     (state) => ({
       isLoading: state.filefolders.isLoading,
-      userFolders: state.filefolders.userFolders,
+      userFolders: state.filefolders.userFolders.filter(
+        (folder) => folder.data && folder.data.parent === "root"
+      ),
+      userFiles: state.filefolders.userFiles.filter(
+        (file) => file.data && file.data.parent === "root"
+      ),
     }),
     shallowEqual
   );
 
-  // Extract unique folder objects based on folder name
   const uniqueFolders = userFolders
-    ? [...new Map(userFolders.map((folder) => [folder.name, folder])).values()]
-    : []; // Use Map to ensure unique folder names
-
-  // Example files data
-  const files = [
-    { name: "New File", userId: "1" },
-    { name: "New File 2", userId: "2" }
-  ];
+    ? userFolders.map(folder => ({
+        docId: folder.docId,
+        data: folder.data,
+        name: folder.data.name,
+        userId: folder.data.userId,
+        createdAt: folder.data.createdAt,
+        parent: folder.data.parent
+      }))
+    : [];
 
   return (
     <div className="col-md-12 w-100">
@@ -27,13 +32,8 @@ const HomeComponents = () => {
         <h1 className="display-1 my-5 text-center">Loading.....</h1>
       ) : (
         <>
-          {/* Pass the complete unique folder objects to ShowItems */}
-          <ShowItems
-            title={"Created Folders"}
-            type={"folder"}
-            items={uniqueFolders}
-          />
-          <ShowItems title={"Created Files"} type={"file"} items={files} />
+          <ShowItems title={"Created Folders"} type={"folder"} items={uniqueFolders} />
+          <ShowItems title={"Created Files"} type={"file"} items={userFiles} />
         </>
       )}
     </div>
