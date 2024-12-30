@@ -16,6 +16,11 @@ const setLoading = (payload) => ({
   type: types.SET_LOADING, // Using the correct action type from the action types file
   payload,
 });
+const setchangeFolder = (payload) => ({
+  type: types.CHANGE_FOLDER, // Using the correct action type from the action types file
+  payload,
+});
+
 
 // Action creator to create a folder
 export const createFolder = (data) => (dispatch) => {
@@ -60,3 +65,6 @@ export const getFolders = (userId) => (dispatch) => {
       alert("Failed to fetch folders. Please try again.");
     });
 };
+export const changeFolder = (folder) => (dispatch) => {
+  dispatch(setchangeFolder(folder)); // Dispatch action to change folder
+}

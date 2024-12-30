@@ -2,13 +2,15 @@ import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFolder, faFileAlt } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
-
+import { changeFolder } from "../../../redux/actionCreators/filefolderActionCreator";
+import { useDispatch } from "react-redux";
 const ShowItems = ({ title, items, type }) => {
   const navigate = useNavigate();
-
+  const dispatch = useDispatch();
   // Function to handle double click event
   const handleDbClick = (item) => {
     if (type === "folder") {
+      dispatch(changeFolder(item.userId));
       // Navigate to folder and show the folder details with userId
       navigate(`/dashboard/folder/${item.userId}`);  // You can pass `userId` if you want to show it in the URL or use it in another way
       alert(`Folder clicked! User ID: ${item.userId}`);
