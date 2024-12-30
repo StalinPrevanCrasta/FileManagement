@@ -1,11 +1,10 @@
-import  { useEffect } from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getFolders } from "../../redux/actionCreators/filefolderActionCreator";
 import { Route, Routes } from "react-router-dom";
 import Navbar from "../../Components/DashboardComponent/Navbar/Navbar";
 import SubBar from "../../Components/DashboardComponent/Subbar/SubBar";
 import HomeComponents from "../../Components/DashboardComponent/HomeComponents/HomeComponents";
-import CreateFolder from "../../Components/DashboardComponent/CreateFolder/CreateFolder";
 import FolderComponent from "../../Components/DashboardComponent/FolderComponent/FolderComponent";
 
 const DashboardPage = () => {
@@ -26,8 +25,6 @@ const DashboardPage = () => {
         <Routes>
           <Route path="" element={<HomeComponents />} />
           <Route path="folder/:folderId" element={<FolderComponent />} />
-          <Route path="folder/:folderId/create-folder" element={<CreateFolder />} />
-          <Route path="create-folder" element={<CreateFolder />} />
         </Routes>
       </div>
     </>

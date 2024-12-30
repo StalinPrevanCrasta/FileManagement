@@ -13,9 +13,8 @@ const ShowItems = ({ title, items, type }) => {
   const handleDbClick = (item) => {
     if (type === "folder") {
       dispatch(changeFolder(item.docId));
-      // Navigate to folder and show the folder details with folder name
-      const encodedFolderName = encodeURIComponent(item.data.name);
-      navigate(`/dashboard/folder/${encodedFolderName}`);
+      // Navigate to the folder using its docId instead of name
+      navigate(`/dashboard/folder/${item.docId}`);
     } else {
       alert("File clicked");
     }
@@ -25,42 +24,30 @@ const ShowItems = ({ title, items, type }) => {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    gap: "8px", // Adds spacing between the icon and text
+    gap: "8px",
   };
 
   return (
     <div className="w-100">
       <h4 className="text-center border-bottom py-2">{title}</h4>
       <div className="row gap-2 p-4 flex-wrap">
-        {items.map((item, index) => {
-          // Log the item to check its structure
-          console.log("Item structure:", item);
-
-          // Get the name from the item (ensure the correct path based on the structure)
-          const itemName =
-            item.name || item.data?.name || item.fileName || `Unnamed ${type.charAt(0).toUpperCase() + type.slice(1)}`; // Fallback to "Unnamed Folder/File" if no name exists
-
-          // If name is missing, log the error and display a placeholder
-          if (!itemName || itemName.startsWith("Unnamed")) {
-            console.error("Missing folder or file name for item:", item);
-          }
-
-          // Use itemId or docId as a unique key
-          const itemId = item.docId || index; // Use item.docId if available, else fallback to index
+        {items.map((item) => {
+          const itemName = item.data?.name || "Unnamed";
+          const itemId = item.docId;
 
           return (
             <div
-              key={itemId} // Use itemId as the key
+              key={itemId}
               className="col-md-2 py-3 text-center border d-flex flex-column align-items-center"
-              onDoubleClick={() => handleDbClick(item)} // Pass the entire item to the function
+              onDoubleClick={() => handleDbClick(item)}
             >
               <div style={iconTextStyle}>
                 {type === "folder" ? (
-                  <FontAwesomeIcon icon={faFolder} size="4x" className="mb-3" />
+                  <FontAwesomeIcon icon={faFolder} size="4x" className="mb-3 text-warning" />
                 ) : (
                   <FontAwesomeIcon icon={faFileAlt} size="4x" className="mb-3" />
                 )}
-                <span>{itemName}</span> {/* Display folder/file name */}
+                <span>{itemName}</span>
               </div>
             </div>
           );

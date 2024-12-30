@@ -15,10 +15,10 @@ const FolderComponent = () => {
 
   useEffect(() => {
     if (folderId) {
-      const decodedFolderName = decodeURIComponent(folderId);
-      const currentFolder = userFolders.find(folder => folder.data.name === decodedFolderName);
+      const currentFolder = userFolders.find(folder => folder.docId === folderId);
       if (currentFolder) {
-        dispatch(changeFolder(currentFolder.docId));
+        dispatch(changeFolder(folderId));
+        setCurrentFolderName(currentFolder.data.name);
       }
     }
   }, [folderId, dispatch, userFolders]);
@@ -27,24 +27,27 @@ const FolderComponent = () => {
     if (userFolders.length > 0) {
       setLoading(false);
       if (folderId) {
-        const decodedFolderName = decodeURIComponent(folderId);
-        const currentFolder = userFolders.find(folder => folder.data.name === decodedFolderName);
-        setCurrentFolderName(currentFolder ? currentFolder.data.name : "Unnamed Folder");
-        // Generate breadcrumb
-        const path = [];
-        let parentId = currentFolder ? currentFolder.docId : null;
-        while (parentId) {
-          const folder = userFolders.find(f => f.docId === parentId);
-          if (folder) {
-            path.unshift({ name: folder.data.name, id: encodeURIComponent(folder.data.name) });
-            parentId = folder.data.parent;
-          } else {
-            parentId = null;
+        const currentFolder = userFolders.find(folder => folder.docId === folderId);
+        if (currentFolder) {
+          // Generate breadcrumb
+          const path = [];
+          let current = currentFolder;
+          while (current && current.data.parent !== "root") {
+            path.unshift({
+              name: current.data.name,
+              id: current.docId
+            });
+            current = userFolders.find(f => f.docId === current.data.parent);
           }
+          if (current) {
+            path.unshift({
+              name: current.data.name,
+              id: current.docId
+            });
+          }
+          setBreadcrumb(path);
         }
-        setBreadcrumb(path);
       } else {
-        setCurrentFolderName("Root");
         setBreadcrumb([]);
       }
     }
@@ -55,20 +58,22 @@ const FolderComponent = () => {
   }
 
   // Get only the folders that belong to the current folder
-  const childFolders = userFolders.filter(folder => {
-    return folder.data && folder.data.parent === (folderId || "root");
-  });
+  const childFolders = userFolders.filter(folder => 
+    folder.data && folder.data.parent === folderId
+  );
 
   // Get only the files that belong to the current folder
-  const childFiles = userFiles.filter(
-    file => file.data && file.data.parent === (folderId || "root")
+  const childFiles = userFiles.filter(file => 
+    file.data && file.data.parent === folderId
   ) || [];
 
   return (
     <div className="col-md-12 w-100">
       <nav aria-label="breadcrumb">
         <ol className="breadcrumb">
-          <li className="breadcrumb-item"><Link to="/dashboard">Root</Link></li>
+          <li className="breadcrumb-item">
+            <Link to="/dashboard">Root</Link>
+          </li>
           {breadcrumb.map((crumb, index) => (
             <li key={index} className="breadcrumb-item">
               <Link to={`/dashboard/folder/${crumb.id}`}>{crumb.name}</Link>
@@ -87,7 +92,6 @@ const FolderComponent = () => {
         type={"file"}
         items={childFiles}
       />
-      <Link to={`/dashboard/folder/${folderId}/create-folder`} className="btn btn-primary">Create Folder</Link>
     </div>
   );
 };
