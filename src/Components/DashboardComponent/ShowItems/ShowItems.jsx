@@ -4,10 +4,12 @@ import { faFolder, faFileAlt } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 import { changeFolder } from "../../../redux/actionCreators/filefolderActionCreator";
 import { useDispatch } from "react-redux";
+
 const ShowItems = ({ title, items, type }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  // Function to handle double click event
+  
+  // Function to handle double-click event
   const handleDbClick = (item) => {
     if (type === "folder") {
       dispatch(changeFolder(item.userId));
@@ -35,11 +37,11 @@ const ShowItems = ({ title, items, type }) => {
           console.log("Item structure:", item);
 
           // Get the name from the item (ensure the correct path based on the structure)
-          const itemName = item.name || item.data?.name || item.fileName || "Unnamed Item"; // Adjust based on actual structure
+          const itemName = item.name || item.data?.name || item.fileName; // Adjust based on actual structure
 
           // If name is missing, log the error and display a placeholder
           if (!itemName) {
-            console.error("Missing folder name for item:", item);
+            console.error("Missing folder or file name for item:", item);
           }
 
           // Use itemId or docId as a unique key
@@ -57,7 +59,7 @@ const ShowItems = ({ title, items, type }) => {
                 ) : (
                   <FontAwesomeIcon icon={faFileAlt} size="4x" className="mb-3" />
                 )}
-                <span>{itemName}</span> {/* Display folder/file name */}
+                <span>{itemName || "Unnamed Item"}</span> {/* Display folder/file name */}
               </div>
             </p>
           );
