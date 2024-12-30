@@ -37,10 +37,11 @@ const ShowItems = ({ title, items, type }) => {
           console.log("Item structure:", item);
 
           // Get the name from the item (ensure the correct path based on the structure)
-          const itemName = item.name || item.data?.name || item.fileName; // Adjust based on actual structure
+          const itemName =
+            item.name || item.data?.name || item.fileName || "Unnamed Item"; // Fallback to "Unnamed Item" if no name exists
 
           // If name is missing, log the error and display a placeholder
-          if (!itemName) {
+          if (!itemName || itemName === "Unnamed Item") {
             console.error("Missing folder or file name for item:", item);
           }
 
@@ -59,7 +60,7 @@ const ShowItems = ({ title, items, type }) => {
                 ) : (
                   <FontAwesomeIcon icon={faFileAlt} size="4x" className="mb-3" />
                 )}
-                <span>{itemName || "Unnamed Item"}</span> {/* Display folder/file name */}
+                <span>{itemName}</span> {/* Display folder/file name */}
               </div>
             </p>
           );

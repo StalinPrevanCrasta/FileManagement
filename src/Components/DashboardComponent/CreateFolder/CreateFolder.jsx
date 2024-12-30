@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
-import { useSelector, shallowEqual,useDispatch } from "react-redux";
+import { useSelector, shallowEqual, useDispatch } from "react-redux";
 import { createFolder } from "../../../redux/actionCreators/filefolderActionCreator";
+import { current } from "@reduxjs/toolkit";
 
 const CreateFolder = ({ setIsCreateFolderModalOpen }) => {
   const [folderName, setFolderName] = useState("");
@@ -10,27 +11,41 @@ const CreateFolder = ({ setIsCreateFolderModalOpen }) => {
   // Access user folders from Redux store
   const { userFolders = [], user, currentFolder = "root" } = useSelector(
     (state) => ({
-      userFolders: state.filefolder?.userFolders,
+      userFolders: state.filefolder?.userFolders || [],
       user: state.auth?.user,
-      currentFolder: state.filefolder?.currentFolder,
+      currentFolder: state.filefolder?.currentFolder || "root",
     }),
     shallowEqual
   );
   const dispatch = useDispatch();
 
-  // Check if the folder is already present
+  // Check if the folder already exists
   const checkFolderAlreadyPresent = (name) => {
-    return userFolders.some((folder) => folder.name === name);
-  };
+    const folderPresent = userFolders.filter(
+      (folder) => folder.parent === currentFolder
+    ).find((folder) => folder.name === name);
+    if (folderPresent !== undefined || folderPresent !== null) {
+      return true;
+
+    } else {
+      return false;
+    }
+      
+     
+    };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (folderName) {
-      if (folderName.length > 3) {
-        if (!checkFolderAlreadyPresent(folderName)) {
+
+    const trimmedFolderName = folderName.trim(); // Remove extra spaces
+
+    if (trimmedFolderName) {
+      if (trimmedFolderName.length > 3) {
+        if (!checkFolderAlreadyPresent(trimmedFolderName)) {
+          // Folder doesn't exist; proceed with creation
           const data = {
             createsAt: new Date(),
-            name: folderName,
+            name: trimmedFolderName,
             userId: user.uid,
             createdBy: user.displayName,
             path: currentFolder === "root" ? [] : ["parent folder path!"],
@@ -38,18 +53,18 @@ const CreateFolder = ({ setIsCreateFolderModalOpen }) => {
             lastAccessed: null,
             updatedAt: new Date(),
           };
-         dispatch(createFolder(data));
-          alert(`Folder "${folderName}" created successfully.`);
-          setFolderName("");
-          setIsCreateFolderModalOpen(false);
+          dispatch(createFolder(data)); // Dispatch action to create folder
+          alert(`Folder "${trimmedFolderName}" created successfully.`); // Success message
+          setFolderName(""); // Clear input field
+          setIsCreateFolderModalOpen(false); // Close modal
         } else {
-          alert("Folder already exists!");
+          alert(`Folder "${trimmedFolderName}" already exists!`); // Alert for duplicate folder
         }
       } else {
-        alert("Folder name must be at least 3 characters long.");
+        alert("Folder name must be at least 4 characters long."); // Minimum length validation
       }
     } else {
-      alert("Folder name cannot be empty!");
+      alert("Folder name cannot be empty!"); // Empty input validation
     }
   };
 
