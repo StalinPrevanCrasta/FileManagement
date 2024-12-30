@@ -6,6 +6,16 @@ const setLoading = (status) => ({
   type: types.SET_LOADING,
   payload: status,
 });
+//files
+const addFiles = (payload) => ({
+  type:types.ADD_FILE,
+  payload,
+
+})
+const addFile =(payload)=>({
+  type:types.CREATE_FILE,
+  payload,
+})
 
 // Create Folder
 export const createFolder = (data) => async (dispatch) => {
@@ -96,3 +106,11 @@ export const changeFolder = (folderId) => ({
   type: types.CHANGE_FOLDER,
   payload: folderId,
 });
+
+//files
+ export const getFiles = (userId) => (dispatch) =>{
+  console.log,og(userId);
+ }
+ export const createFile =(data) => (dispatch) =>{
+    console.log(data);
+ }
