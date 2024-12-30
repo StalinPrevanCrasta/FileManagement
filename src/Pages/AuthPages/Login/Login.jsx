@@ -8,9 +8,9 @@ const Login = () => {
       <h1 className='display-1 my-5 text-center'>Login here</h1>
       <div className='row'>
         <div className='col-md-5 mx-auto mt-5'>
-          <LoginForm />
+          <LoginForm />Not a member?&nbsp;
           <Link to="/register" className="text-end">
-            Not a member? Register
+             Register
           </Link>
         </div>
       </div>

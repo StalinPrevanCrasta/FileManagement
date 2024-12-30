@@ -8,9 +8,9 @@ const Register = () => {
     <h1 className='display-1 my-5 text-center'  >Register here</h1>
         <div className='row'>
           <div className='col-md-5 mx-auto mt-5'>
-            <RegisterForm/>
+            <RegisterForm/>Already a member? &nbsp;
             <Link to="/login" className="text-end">
-                   Already a member? Login
+                   Login
              </Link>
  
           </div>
