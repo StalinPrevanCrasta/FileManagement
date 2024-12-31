@@ -1,0 +1,126 @@
+/* Reset default styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.App {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
+
+/* Dashboard layout */
+.container-fluid {
+  padding: 20px;
+}
+
+/* Card styles */
+.card {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  border: none;
+}
+
+.card-header {
+  background-color: #fff;
+  border-bottom: 1px solid #eee;
+  padding: 15px;
+}
+
+.card-body {
+  padding: 20px;
+}
+
+/* File and folder items */
+.file-item, .folder-item {
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.file-item:hover, .folder-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Modal styles */
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Navigation */
+.breadcrumb {
+  background-color: transparent;
+  padding: 10px 0;
+  margin-bottom: 20px;
+}
+
+.breadcrumb-item a {
+  color: #6c757d;
+  text-decoration: none;
+}
+
+.breadcrumb-item.active {
+  color: #343a40;
+}
+
+/* Buttons */
+.btn {
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.btn-outline-dark:hover {
+  background-color: #343a40;
+  color: white;
+}
+
+/* Icons */
+.fa-folder {
+  color: #ffd700;
+}
+
+.fa-file-alt {
+  color: #007bff;
+}
+
+/* Loading state */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+/* File content area */
+.file-content {
+  min-height: 300px;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 4px;
+}
+
+/* Grid layout for files and folders */
+.row.gap-2 {
+  margin: -8px;
+}
+
+.row.gap-2 > div {
+  margin: 8px;
+  flex-basis: calc(20% - 16px);
+  min-width: 150px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .row.gap-2 > div {
+    flex-basis: calc(33.333% - 16px);
+  }
+}
+
+@media (max-width: 576px) {
+  .row.gap-2 > div {
+    flex-basis: calc(50% - 16px);
+  }
+}
