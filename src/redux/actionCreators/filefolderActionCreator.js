@@ -174,19 +174,31 @@ export const getFiles = (userId) => async (dispatch) => {
 };
 
 // Upload File
-export const uploadFile = (file, parentId, userId) => async (dispatch) => {
+export const uploadFile = (file, parentId, userId, path = '') => async (dispatch) => {
   try {
     dispatch(setLoading(true));
 
     // Create a reference to Firebase Storage
     const storageRef = fire.storage().ref();
-    const fileRef = storageRef.child(`files/${userId}/${file.name}`);
     
-    // Upload the file
-    await fileRef.put(file);
+    // Use the full path if it's a folder upload, otherwise just the filename
+    const storagePath = path || file.name;
+    const fileRef = storageRef.child(`files/${userId}/${storagePath}`);
+    
+    // Set metadata
+    const metadata = {
+      contentType: file.type,
+      customMetadata: {
+        parent: parentId,
+        userId: userId
+      }
+    };
 
+    // Upload the file with metadata
+    const snapshot = await fileRef.put(file, metadata);
+    
     // Get the download URL
-    const url = await fileRef.getDownloadURL();
+    const url = await snapshot.ref.getDownloadURL();
 
     // Add file data to Firestore
     const fileData = {
@@ -195,7 +207,8 @@ export const uploadFile = (file, parentId, userId) => async (dispatch) => {
       userId: userId,
       parent: parentId,
       createdAt: new Date(),
-      type: file.type
+      type: file.type,
+      path: storagePath
     };
 
     const fileRef2 = await fire.firestore().collection("files").add(fileData);
@@ -213,12 +226,10 @@ export const uploadFile = (file, parentId, userId) => async (dispatch) => {
     });
 
     dispatch(setLoading(false));
-    alert("File uploaded successfully!");
     return true;
   } catch (error) {
     console.error("Error uploading file:", error);
     dispatch(setLoading(false));
-    alert("Error uploading file. Please try again.");
     return false;
   }
 };

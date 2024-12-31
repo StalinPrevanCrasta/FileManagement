@@ -3,21 +3,28 @@ import { useDispatch, useSelector } from "react-redux";
 import { createFolder } from "../../../redux/actionCreators/filefolderActionCreator";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
+import { useLocation, useParams } from "react-router-dom";
 
-const CreateFolder = ({ setIsCreateFolderModalOpen, parentId }) => {
+const CreateFolder = ({ setIsCreateFolderModalOpen }) => {
   const [folderName, setFolderName] = useState("");
   const dispatch = useDispatch();
+  const location = useLocation();
+  const { folderId } = useParams();
 
   // Get current user from Redux state
   const { user } = useSelector(state => state.auth);
+  const { currentFolder } = useSelector(state => state.filefolders);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (folderName.trim()) {
+      // Determine the parent folder based on current location
+      const parent = location.pathname.includes('/folder/') ? currentFolder : "root";
+      
       const data = {
         name: folderName.trim(),
         userId: user.uid,
-        parent: parentId || "root",
+        parent: parent,
         createdAt: new Date(),
       };
 
@@ -45,7 +52,7 @@ const CreateFolder = ({ setIsCreateFolderModalOpen, parentId }) => {
         <div className="col-md-4 mt-5 bg-white rounded p-4">
           <div className="d-flex justify-content-between align-items-center mb-4">
             <h4 className="mb-0">
-              Create New Folder {parentId !== "root" ? "in Current Folder" : ""}
+              Create New Folder {location.pathname.includes('/folder/') ? "in Current Folder" : ""}
             </h4>
             <button 
               className="btn"

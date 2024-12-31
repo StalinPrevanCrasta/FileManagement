@@ -2,7 +2,7 @@ import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFolder, faFileAlt, faCheck } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
-import { changeFolder } from "../../../redux/actionCreators/filefolderActionCreator";
+import { changeFolder, moveFolder, moveFile } from "../../../redux/actionCreators/filefolderActionCreator";
 import { useDispatch } from "react-redux";
 
 const ShowItems = ({ title, items, type, selectedItems, setSelectedItems }) => {
@@ -27,6 +27,41 @@ const ShowItems = ({ title, items, type, selectedItems, setSelectedItems }) => {
     }
   };
 
+  // Drag and drop handlers
+  const handleDragStart = (e, item) => {
+    e.dataTransfer.setData("itemId", item.docId);
+    e.dataTransfer.setData("itemType", type);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    if (type === "folder") {
+      e.currentTarget.style.backgroundColor = "#e9ecef";
+    }
+  };
+
+  const handleDragLeave = (e) => {
+    if (type === "folder") {
+      e.currentTarget.style.backgroundColor = "";
+    }
+  };
+
+  const handleDrop = (e, targetFolder) => {
+    e.preventDefault();
+    e.currentTarget.style.backgroundColor = "";
+    
+    const itemId = e.dataTransfer.getData("itemId");
+    const itemType = e.dataTransfer.getData("itemType");
+
+    if (type === "folder" && targetFolder.docId !== itemId) {
+      if (itemType === "folder") {
+        dispatch(moveFolder(itemId, targetFolder.docId));
+      } else if (itemType === "file") {
+        dispatch(moveFile(itemId, targetFolder.docId));
+      }
+    }
+  };
+
   return (
     <div className="w-100">
       <h4 className="text-center border-bottom py-2">{title}</h4>
@@ -42,6 +77,11 @@ const ShowItems = ({ title, items, type, selectedItems, setSelectedItems }) => {
               className={`col-md-2 py-3 text-center border rounded position-relative ${isSelected ? 'bg-light' : ''}`}
               onDoubleClick={() => handleDbClick(item)}
               onClick={(e) => handleSelect(e, item)}
+              draggable
+              onDragStart={(e) => handleDragStart(e, item)}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={(e) => handleDrop(e, item)}
               style={{ cursor: "pointer" }}
             >
               {isSelected && (
