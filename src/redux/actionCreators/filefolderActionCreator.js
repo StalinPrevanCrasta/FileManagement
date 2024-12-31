@@ -1,5 +1,6 @@
 import * as types from "../actionsTypes/filefolderActionTypes";
 import fire from "../../config/firebase";
+import "firebase/compat/storage"; // Add this import
 
 // Set Loading
 const setLoading = (status) => ({
@@ -167,6 +168,72 @@ export const getFiles = (userId) => async (dispatch) => {
     dispatch(setLoading(false));
   } catch (error) {
     console.error("Error getting files:", error);
+    dispatch(setLoading(false));
+  }
+};
+
+// Upload File
+export const uploadFile = (file, parentId, userId, setSuccess) => async (dispatch) => {
+  try {
+    dispatch(setLoading(true));
+
+    const storageRef = fire.storage().ref(); // Ensure fire.storage() is used correctly
+    const fileRef = storageRef.child(`files/${userId}/${file.name}`);
+    await fileRef.put(file);
+
+    const url = await fileRef.getDownloadURL();
+
+    const filesRef = fire.firestore().collection("files");
+    const newFile = {
+      name: file.name,
+      url,
+      parent: parentId || "root",
+      userId,
+      createdAt: new Date(),
+    };
+
+    const fileDocRef = await filesRef.add(newFile);
+
+    dispatch({
+      type: types.CREATE_FILE,
+      payload: {
+        data: newFile,
+        docId: fileDocRef.id,
+      },
+    });
+
+    alert("File uploaded successfully!");
+    setSuccess(true);
+    dispatch(setLoading(false));
+  } catch (error) {
+    console.error("Error uploading file:", error);
+    alert("Error uploading file. Please try again.");
+    setSuccess(false);
+    dispatch(setLoading(false));
+  }
+};
+
+// Add this function to handle moving folders
+export const moveFolder = (folderId, targetParentId) => async (dispatch) => {
+  try {
+    dispatch(setLoading(true));
+
+    const foldersRef = fire.firestore().collection("folders");
+
+    // Update the parent of the folder
+    await foldersRef.doc(folderId).update({ parent: targetParentId });
+
+    // Dispatch an action to update the state
+    dispatch({
+      type: types.MOVE_FOLDER,
+      payload: { folderId, targetParentId },
+    });
+
+    alert("Folder moved successfully!");
+    dispatch(setLoading(false));
+  } catch (error) {
+    console.error("Error moving folder:", error);
+    alert("Error moving folder. Please try again.");
     dispatch(setLoading(false));
   }
 };

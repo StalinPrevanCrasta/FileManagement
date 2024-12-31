@@ -44,6 +44,14 @@ const filefoldersReducer = (state = initialState, action) => {
                 ...state,
                 userFiles: [...state.userFiles, action.payload],
             };
+        case types.MOVE_FOLDER:
+            const { folderId, targetParentId } = action.payload;
+            return {
+                ...state,
+                userFolders: state.userFolders.map(folder =>
+                    folder.docId === folderId ? { ...folder, data: { ...folder.data, parent: targetParentId } } : folder
+                ),
+            };
             
         default:
             return state;

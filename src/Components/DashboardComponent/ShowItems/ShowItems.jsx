@@ -2,7 +2,7 @@ import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFolder, faFileAlt } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
-import { changeFolder } from "../../../redux/actionCreators/filefolderActionCreator";
+import { changeFolder, moveFolder } from "../../../redux/actionCreators/filefolderActionCreator";
 import { useDispatch } from "react-redux";
 
 const ShowItems = ({ title, items, type }) => {
@@ -17,6 +17,17 @@ const ShowItems = ({ title, items, type }) => {
     } else {
       navigate(`/dashboard/file/${item.docId}`);
     }
+  };
+
+  // Drag and drop handlers
+  const handleDragStart = (e, item) => {
+    e.dataTransfer.setData("folderId", item.docId);
+  };
+
+  const handleDrop = (e) => {
+    const folderId = e.dataTransfer.getData("folderId");
+    const targetFolderId = e.currentTarget.dataset.id; // Assuming you set data-id on the target
+    dispatch(moveFolder(folderId, targetFolderId)); // Dispatch moveFolder action
   };
 
   const iconTextStyle = {
@@ -41,6 +52,11 @@ const ShowItems = ({ title, items, type }) => {
               className="col-md-2 py-3 text-center border rounded"
               onDoubleClick={() => handleDbClick(item)}
               style={{ cursor: "pointer" }}
+              draggable
+              onDragStart={(e) => handleDragStart(e, item)}
+              onDrop={handleDrop}
+              onDragOver={(e) => e.preventDefault()}
+              data-id={itemId}
             >
               <div style={iconTextStyle}>
                 {type === "folder" ? (

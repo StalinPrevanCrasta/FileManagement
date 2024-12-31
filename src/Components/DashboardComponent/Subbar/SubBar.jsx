@@ -5,11 +5,14 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFileAlt, faFileUpload, faFolderPlus } from "@fortawesome/free-solid-svg-icons";
 import { useSelector } from "react-redux";
 import CreateFolder from "../CreateFolder/CreateFolder";
+import UploadFile from "../UploadFile/UploadFile";
+import PropTypes from 'prop-types';
 
-const SubBar = ({setIsCreateFileModalOpen}) => {
+const SubBar = ({ setIsCreateFileModalOpen }) => {
   const location = useLocation();
   const { folderId } = useParams();
   const [isCreateFolderModalOpen, setIsCreateFolderModalOpen] = useState(false);
+  const [isUploadFileModalOpen, setIsUploadFileModalOpen] = useState(false);
   
   // Get current folder from Redux state
   const { currentFolder } = useSelector(state => state.filefolders);
@@ -35,7 +38,10 @@ const SubBar = ({setIsCreateFileModalOpen}) => {
 
         <ul className="navbar-nav ms-auto me-5">
           <li className="nav-item mx-2">
-            <button className="btn btn-outline-dark">
+            <button 
+              className="btn btn-outline-dark"
+              onClick={() => setIsUploadFileModalOpen(true)}
+            >
               <FontAwesomeIcon icon={faFileUpload} />
               &nbsp; Upload Files
             </button>
@@ -66,8 +72,18 @@ const SubBar = ({setIsCreateFileModalOpen}) => {
           parentId={currentFolder} // Pass the current folder ID
         />
       )}
+
+      {isUploadFileModalOpen && (
+        <UploadFile 
+          setIsUploadFileModalOpen={setIsUploadFileModalOpen}
+        />
+      )}
     </>
   );
+};
+
+SubBar.propTypes = {
+  setIsCreateFileModalOpen: PropTypes.func.isRequired,
 };
 
 export default SubBar;
