@@ -9,7 +9,7 @@ const Homepage = () => {
       {/* Navigation Bar */}
       <nav className="navbar">
         <div className="navbar-links">
-          {/* No buttons here */}
+          {/* Removed Dashboard and Logout buttons */}
         </div>
       </nav>
 

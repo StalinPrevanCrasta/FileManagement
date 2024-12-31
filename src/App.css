@@ -1,56 +1,10 @@
-/* Set the background to a smooth dark color */
+/* Ensure the entire page background is black */
 body {
-  background-color: #1a1a1a; /* Charcoal gray background */
-  color: white; /* Main text color */
+  background-color: black;
+  color: white; /* White text to contrast with black background */
   margin: 0;
   font-family: Arial, sans-serif;
   height: 100vh; /* Full screen height */
-  position: relative; /* For positioning the beams */
-  overflow: hidden; /* Ensure beams do not overflow outside the screen */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  animation: changeBackgroundColor 10s infinite alternate; /* Gradual background color change */
-}
-
-/* Animation for smooth background color change */
-@keyframes changeBackgroundColor {
-  0% {
-    background-color: #1a1a1a;
-  }
-  50% {
-    background-color: #2a2a2a; /* Slightly lighter gray */
-  }
-  100% {
-    background-color: #1a1a1a;
-  }
-}
-
-/* Adding a subtle beam effect to the background */
-@keyframes beamEffect {
-  0% {
-    background-position: 200% 0, 0 100%;
-  }
-  50% {
-    background-position: 0 100%, 200% 0;
-  }
-  100% {
-    background-position: 200% 0, 0 100%;
-  }
-}
-
-/* Beam effect styling */
-body::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(45deg, rgba(0, 123, 255, 0.2), rgba(255, 255, 255, 0.1), rgba(0, 255, 255, 0.3), rgba(0, 123, 255, 0.2));
-  background-size: 200% 200%;
-  animation: beamEffect 5s infinite linear; /* Animation for beam movement */
-  z-index: -1; /* Behind content */
 }
 
 /* Navbar styling */
@@ -59,9 +13,10 @@ body::before {
   top: 0;
   left: 0;
   width: 100%;
-  background-color: #1a1a1a; /* Dark background for navbar */
+  background-color: black; /* Navbar background black */
   padding: 10px 20px;
   z-index: 1000;
+  /* Removed the border-bottom to eliminate the white line */
 }
 
 /* Main container to center everything */
@@ -70,7 +25,7 @@ body::before {
   flex-direction: column;
   justify-content: center; /* Vertically center */
   align-items: center; /* Horizontally center */
-  background-color: #1a1a1a;
+  background-color: black;
   color: white;
   height: 100vh; /* Make sure it takes the full height of the viewport */
   text-align: center; /* Center text horizontally */
@@ -85,28 +40,13 @@ body::before {
   align-items: center; /* Horizontally center */
 }
 
-/* Falling effect for DOCUSPHERE */
 .heading {
   font-size: 5rem; /* Increased font size */
   margin-bottom: 30px; /* Space between heading and buttons */
-  animation: fallDown 2s ease-in-out, fadeIn 2s ease-in-out, glowEffect 2s infinite alternate; /* Falling + Fade-in + Glow effect */
+  animation: fadeIn 2s ease-in-out, slideUp 2s ease-in-out; /* Animation effects */
 }
 
-/* Falling animation */
-@keyframes fallDown {
-  0% {
-    transform: translateY(-100px); /* Start above the screen */
-    opacity: 0;
-  }
-  50% {
-    opacity: 0.6;
-  }
-  100% {
-    transform: translateY(0); /* End at its original position */
-    opacity: 1;
-  }
-}
-
+/* Animation for DOCUSPHERE heading */
 @keyframes fadeIn {
   0% {
     opacity: 0;
@@ -116,16 +56,12 @@ body::before {
   }
 }
 
-/* Glow effect for DOCUSPHERE */
-@keyframes glowEffect {
+@keyframes slideUp {
   0% {
-    text-shadow: 0 0 10px rgba(0, 123, 255, 0.6), 0 0 20px rgba(0, 123, 255, 0.4);
-  }
-  50% {
-    text-shadow: 0 0 20px rgba(0, 255, 255, 0.8), 0 0 30px rgba(0, 255, 255, 0.5);
+    transform: translateY(20px);
   }
   100% {
-    text-shadow: 0 0 10px rgba(0, 123, 255, 0.6), 0 0 20px rgba(0, 123, 255, 0.4);
+    transform: translateY(0);
   }
 }
 
@@ -141,17 +77,13 @@ body::before {
   padding: 15px 40px; /* Increased horizontal padding for oval shape */
   font-size: 1.2rem;
   cursor: pointer;
-  border: 2px solid #007bff; /* Blue border */
-  background-color: #1a1a1a; /* Dark background to match the theme */
+  border: 2px solid white;
+  background-color: black; /* Button background black */
   color: white; /* Button text white */
   border-radius: 50px; /* Make the button oval */
-  transition: all 0.3s ease; /* Smooth transition for hover effect */
 }
 
 .main-button:hover {
-  background-color: #007bff; /* Light blue background on hover */
-  color: #1a1a1a; /* Dark text on hover */
-  transform: scale(1.1); /* Slight scaling effect */
-  box-shadow: 0 0 20px rgba(0, 123, 255, 0.5); /* Glowing effect on hover */
+  background-color: white;
+  color: black;
 }
- 
