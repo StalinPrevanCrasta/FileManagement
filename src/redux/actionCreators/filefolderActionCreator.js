@@ -1,5 +1,7 @@
 import * as types from "../actionsTypes/filefolderActionTypes";
 import fire from "../../config/firebase";
+import "firebase/compat/storage"; // Add this import
+import { MOVE_FILE } from "../actionsTypes/filefolderActionTypes";
 
 // Set Loading
 const setLoading = (status) => ({
@@ -168,5 +170,94 @@ export const getFiles = (userId) => async (dispatch) => {
   } catch (error) {
     console.error("Error getting files:", error);
     dispatch(setLoading(false));
+  }
+};
+
+// Upload File
+export const uploadFile = (file, parentId, userId, setSuccess) => async (dispatch) => {
+  try {
+    dispatch(setLoading(true));
+
+    const storageRef = fire.storage().ref(); // Ensure fire.storage() is used correctly
+    const fileRef = storageRef.child(`files/${userId}/${file.name}`);
+    await fileRef.put(file);
+
+    const url = await fileRef.getDownloadURL();
+
+    const filesRef = fire.firestore().collection("files");
+    const newFile = {
+      name: file.name,
+      url,
+      parent: parentId || "root",
+      userId,
+      createdAt: new Date(),
+    };
+
+    const fileDocRef = await filesRef.add(newFile);
+
+    dispatch({
+      type: types.CREATE_FILE,
+      payload: {
+        data: newFile,
+        docId: fileDocRef.id,
+      },
+    });
+
+    alert("File uploaded successfully!");
+    setSuccess(true);
+    dispatch(setLoading(false));
+  } catch (error) {
+    console.error("Error uploading file:", error);
+    alert("Error uploading file. Please try again.");
+    setSuccess(false);
+    dispatch(setLoading(false));
+  }
+};
+
+// Add this function to handle moving folders
+export const moveFolder = (folderId, targetParentId) => async (dispatch) => {
+  try {
+    dispatch(setLoading(true));
+
+    const foldersRef = fire.firestore().collection("folders");
+
+    // Update the parent of the folder
+    await foldersRef.doc(folderId).update({ parent: targetParentId });
+
+    // Dispatch an action to update the state
+    dispatch({
+      type: types.MOVE_FOLDER,
+      payload: { folderId, targetParentId },
+    });
+
+    alert("Folder moved successfully!");
+    dispatch(setLoading(false));
+  } catch (error) {
+    console.error("Error moving folder:", error);
+    alert("Error moving folder. Please try again.");
+    dispatch(setLoading(false));
+  }
+};
+
+export const moveFile = (fileId, targetFolderId) => async (dispatch, getState) => {
+  try {
+    const state = getState();
+    const file = state.filefolders.userFiles.find(file => file.docId === fileId);
+    if (!file) throw new Error("File not found");
+
+    console.log(`Moving file with ID: ${fileId} to folder with ID: ${targetFolderId}`);
+
+    await fire.firestore().collection("files").doc(fileId).update({
+      parent: targetFolderId
+    });
+
+    dispatch({
+      type: MOVE_FILE,
+      payload: { fileId, targetFolderId }
+    });
+
+    console.log(`File with ID: ${fileId} successfully moved to folder with ID: ${targetFolderId}`);
+  } catch (error) {
+    console.error("Error moving file:", error);
   }
 };

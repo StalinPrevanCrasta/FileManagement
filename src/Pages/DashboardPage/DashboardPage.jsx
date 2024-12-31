@@ -33,6 +33,13 @@ const DashboardPage = () => {
     }
   }, [pathname]);
 
+  const handleMoveOperation = () => {
+    if (isAuthenticated && user?.uid) {
+      dispatch(getFolders(user.uid));
+      dispatch(getFiles(user.uid));
+    }
+  };
+
   return (
     <>
       {isCreateFolderModalOpen && (
