@@ -8,12 +8,11 @@ import { useDispatch } from "react-redux";
 const ShowItems = ({ title, items, type }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  
+
   // Function to handle double-click event
   const handleDbClick = (item) => {
     if (type === "folder") {
       dispatch(changeFolder(item.docId));
-      // Navigate to the folder using its docId instead of name
       navigate(`/dashboard/folder/${item.docId}`);
     } else {
       alert("File clicked");
@@ -22,6 +21,7 @@ const ShowItems = ({ title, items, type }) => {
 
   const iconTextStyle = {
     display: "flex",
+    flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
     gap: "8px",
@@ -38,16 +38,25 @@ const ShowItems = ({ title, items, type }) => {
           return (
             <div
               key={itemId}
-              className="col-md-2 py-3 text-center border d-flex flex-column align-items-center"
+              className="col-md-2 py-3 text-center border rounded"
               onDoubleClick={() => handleDbClick(item)}
+              style={{ cursor: "pointer" }}
             >
               <div style={iconTextStyle}>
                 {type === "folder" ? (
-                  <FontAwesomeIcon icon={faFolder} size="4x" className="mb-3 text-warning" />
+                  <FontAwesomeIcon 
+                    icon={faFolder} 
+                    size="4x" 
+                    className="text-warning"
+                  />
                 ) : (
-                  <FontAwesomeIcon icon={faFileAlt} size="4x" className="mb-3" />
+                  <FontAwesomeIcon 
+                    icon={faFileAlt} 
+                    size="4x" 
+                    className="text-primary"
+                  />
                 )}
-                <span>{itemName}</span>
+                <span className="mt-2">{itemName}</span>
               </div>
             </div>
           );
@@ -58,4 +67,3 @@ const ShowItems = ({ title, items, type }) => {
 };
 
 export default ShowItems;
-

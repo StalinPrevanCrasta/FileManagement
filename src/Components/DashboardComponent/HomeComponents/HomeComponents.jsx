@@ -13,9 +13,11 @@ const makeSelectDerivedData = createSelector(
     userFolders: filefolders.userFolders.filter(
       (folder) => folder.data && folder.data.parent === "root"
     ),
-    userFiles: filefolders.userFiles.filter(
-      (file) => file.data && file.data.parent === "root"
-    ),
+    userFiles: Array.isArray(filefolders.userFiles) 
+      ? filefolders.userFiles.filter(
+          (file) => file.data && file.data.parent === "root"
+        )
+      : [],
   })
 );
 
@@ -39,6 +41,12 @@ const HomeComponents = () => {
     [userFolders]
   );
 
+  // Changed this to show all files in root
+  const filteredFiles = useMemo(
+    () => userFiles.filter((file) => file.data && file.data.parent === "root"),
+    [userFiles]
+  );
+
   return (
     <div className="col-md-12 w-100">
       {isLoading ? (
@@ -46,7 +54,11 @@ const HomeComponents = () => {
       ) : (
         <>
           <ShowItems title={"Created Folders"} type={"folder"} items={uniqueFolders} />
-          <ShowItems title={"Created Files"} type={"file"} items={userFiles} />
+          <ShowItems 
+            title={"Created Files"} 
+            type={"file"} 
+            items={filteredFiles} 
+          />
         </>
       )}
     </div>

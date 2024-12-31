@@ -63,9 +63,11 @@ const FolderComponent = () => {
   );
 
   // Get only the files that belong to the current folder
-  const childFiles = userFiles.filter(file => 
-    file.data && file.data.parent === folderId
-  ) || [];
+  const childFiles = Array.isArray(userFiles) 
+    ? userFiles.filter(file => 
+        file.data && file.data.parent === folderId
+      )
+    : [];
 
   return (
     <div className="col-md-12 w-100">
@@ -87,11 +89,13 @@ const FolderComponent = () => {
         type={"folder"}
         items={childFolders}
       />
-      <ShowItems
-        title={"Files"}
-        type={"file"}
-        items={childFiles}
-      />
+      {childFiles.length > 0 && (
+        <ShowItems
+          title={"Files"}
+          type={"file"}
+          items={childFiles}
+        />
+      )}
     </div>
   );
 };
