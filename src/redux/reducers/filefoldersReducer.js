@@ -61,6 +61,20 @@ const filefoldersReducer = (state = initialState, action) => {
                         : file
                 ),
             };
+        case types.DELETE_FOLDER:
+            return {
+                ...state,
+                userFolders: state.userFolders.filter(
+                    folder => folder.docId !== action.payload
+                ),
+            };
+        case types.DELETE_FILE:
+            return {
+                ...state,
+                userFiles: state.userFiles.filter(
+                    file => file.docId !== action.payload
+                ),
+            };
             
         default:
             return state;

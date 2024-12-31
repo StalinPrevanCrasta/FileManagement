@@ -174,43 +174,52 @@ export const getFiles = (userId) => async (dispatch) => {
 };
 
 // Upload File
-export const uploadFile = (file, parentId, userId, setSuccess) => async (dispatch) => {
+export const uploadFile = (file, parentId, userId) => async (dispatch) => {
   try {
     dispatch(setLoading(true));
 
-    const storageRef = fire.storage().ref(); // Ensure fire.storage() is used correctly
+    // Create a reference to Firebase Storage
+    const storageRef = fire.storage().ref();
     const fileRef = storageRef.child(`files/${userId}/${file.name}`);
+    
+    // Upload the file
     await fileRef.put(file);
 
+    // Get the download URL
     const url = await fileRef.getDownloadURL();
 
-    const filesRef = fire.firestore().collection("files");
-    const newFile = {
+    // Add file data to Firestore
+    const fileData = {
       name: file.name,
-      url,
-      parent: parentId || "root",
-      userId,
+      url: url,
+      userId: userId,
+      parent: parentId,
       createdAt: new Date(),
+      type: file.type
     };
 
-    const fileDocRef = await filesRef.add(newFile);
+    const fileRef2 = await fire.firestore().collection("files").add(fileData);
 
+    // Create file object for Redux
+    const newFile = {
+      data: fileData,
+      docId: fileRef2.id
+    };
+
+    // Dispatch to Redux store
     dispatch({
       type: types.CREATE_FILE,
-      payload: {
-        data: newFile,
-        docId: fileDocRef.id,
-      },
+      payload: newFile
     });
 
-    alert("File uploaded successfully!");
-    setSuccess(true);
     dispatch(setLoading(false));
+    alert("File uploaded successfully!");
+    return true;
   } catch (error) {
     console.error("Error uploading file:", error);
-    alert("Error uploading file. Please try again.");
-    setSuccess(false);
     dispatch(setLoading(false));
+    alert("Error uploading file. Please try again.");
+    return false;
   }
 };
 
@@ -259,5 +268,61 @@ export const moveFile = (fileId, targetFolderId) => async (dispatch, getState) =
     console.log(`File with ID: ${fileId} successfully moved to folder with ID: ${targetFolderId}`);
   } catch (error) {
     console.error("Error moving file:", error);
+  }
+};
+
+// Delete Folder
+export const deleteFolder = (folderId) => async (dispatch) => {
+  try {
+    dispatch(setLoading(true));
+
+    // Delete from Firestore
+    await fire.firestore().collection("folders").doc(folderId).delete();
+
+    // Update Redux state
+    dispatch({
+      type: types.DELETE_FOLDER,
+      payload: folderId,
+    });
+
+    dispatch(setLoading(false));
+    alert("Folder deleted successfully!");
+  } catch (error) {
+    console.error("Error deleting folder:", error);
+    alert("Error deleting folder. Please try again.");
+    dispatch(setLoading(false));
+  }
+};
+
+// Delete File
+export const deleteFile = (fileId) => async (dispatch) => {
+  try {
+    dispatch(setLoading(true));
+
+    // Get file data first to get the storage URL
+    const fileDoc = await fire.firestore().collection("files").doc(fileId).get();
+    const fileData = fileDoc.data();
+
+    if (fileData && fileData.url) {
+      // Delete from Storage
+      const fileRef = fire.storage().refFromURL(fileData.url);
+      await fileRef.delete();
+    }
+
+    // Delete from Firestore
+    await fire.firestore().collection("files").doc(fileId).delete();
+
+    // Update Redux state
+    dispatch({
+      type: types.DELETE_FILE,
+      payload: fileId,
+    });
+
+    dispatch(setLoading(false));
+    alert("File deleted successfully!");
+  } catch (error) {
+    console.error("Error deleting file:", error);
+    alert("Error deleting file. Please try again.");
+    dispatch(setLoading(false));
   }
 };

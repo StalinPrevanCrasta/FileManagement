@@ -2,23 +2,37 @@ import React, { useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 import "./SubBar.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFileAlt, faFileUpload, faFolderPlus } from "@fortawesome/free-solid-svg-icons";
-import { useSelector } from "react-redux";
+import { faFileAlt, faFileUpload, faFolderPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { useDispatch } from "react-redux";
+import { deleteFile, deleteFolder } from "../../../redux/actionCreators/filefolderActionCreator";
 import CreateFolder from "../CreateFolder/CreateFolder";
 import UploadFile from "../UploadFile/UploadFile";
 import PropTypes from 'prop-types';
 
-const SubBar = ({ setIsCreateFileModalOpen }) => {
+const SubBar = ({ setIsCreateFileModalOpen, selectedItems, setSelectedItems }) => {
   const location = useLocation();
+  const dispatch = useDispatch();
   const { folderId } = useParams();
   const [isCreateFolderModalOpen, setIsCreateFolderModalOpen] = useState(false);
   const [isUploadFileModalOpen, setIsUploadFileModalOpen] = useState(false);
   
-  // Get current folder from Redux state
-  const { currentFolder } = useSelector(state => state.filefolders);
-  
-  // Determine if we're in the root folder or a subfolder
-  const isRoot = location.pathname === "/dashboard";
+  const handleDelete = () => {
+    if (selectedItems.length === 0) {
+      alert("Please select items to delete");
+      return;
+    }
+
+    if (window.confirm(`Are you sure you want to delete ${selectedItems.length} item(s)?`)) {
+      selectedItems.forEach(item => {
+        if (item.type === "folder") {
+          dispatch(deleteFolder(item.docId));
+        } else {
+          dispatch(deleteFile(item.docId));
+        }
+      });
+      setSelectedItems([]); // Clear selection after delete
+    }
+  };
 
   return (
     <>
@@ -28,15 +42,23 @@ const SubBar = ({ setIsCreateFileModalOpen }) => {
             <li className="breadcrumb-item">
               <Link to="/dashboard">Root</Link>
             </li>
-            {!isRoot && (
-              <li className="breadcrumb-item active" aria-current="page">
-                {folderId}
-              </li>
+            {location.pathname !== "/dashboard" && (
+              <li className="breadcrumb-item active">{folderId}</li>
             )}
           </ol>
         </nav>
 
         <ul className="navbar-nav ms-auto me-5">
+          <li className="nav-item mx-2">
+            <button 
+              className="btn btn-outline-danger"
+              onClick={handleDelete}
+              disabled={selectedItems.length === 0}
+            >
+              <FontAwesomeIcon icon={faTrash} />
+              &nbsp; Delete ({selectedItems.length})
+            </button>
+          </li>
           <li className="nav-item mx-2">
             <button 
               className="btn btn-outline-dark"
@@ -47,9 +69,10 @@ const SubBar = ({ setIsCreateFileModalOpen }) => {
             </button>
           </li>
           <li className="nav-item mx-2">
-            <button className="btn btn-outline-dark"
-            onClick={() => setIsCreateFileModalOpen(true)}>
-              
+            <button 
+              className="btn btn-outline-dark"
+              onClick={() => setIsCreateFileModalOpen(true)}
+            >
               <FontAwesomeIcon icon={faFileAlt} />
               &nbsp; Create File
             </button>
@@ -67,16 +90,10 @@ const SubBar = ({ setIsCreateFileModalOpen }) => {
       </nav>
 
       {isCreateFolderModalOpen && (
-        <CreateFolder 
-          setIsCreateFolderModalOpen={setIsCreateFolderModalOpen}
-          parentId={currentFolder} // Pass the current folder ID
-        />
+        <CreateFolder setIsCreateFolderModalOpen={setIsCreateFolderModalOpen} />
       )}
-
       {isUploadFileModalOpen && (
-        <UploadFile 
-          setIsUploadFileModalOpen={setIsUploadFileModalOpen}
-        />
+        <UploadFile setIsUploadFileModalOpen={setIsUploadFileModalOpen} />
       )}
     </>
   );
@@ -84,6 +101,8 @@ const SubBar = ({ setIsCreateFileModalOpen }) => {
 
 SubBar.propTypes = {
   setIsCreateFileModalOpen: PropTypes.func.isRequired,
+  selectedItems: PropTypes.array.isRequired,
+  setSelectedItems: PropTypes.func.isRequired,
 };
 
 export default SubBar;

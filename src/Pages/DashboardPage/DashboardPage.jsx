@@ -17,6 +17,7 @@ const DashboardPage = () => {
   const [isCreateFolderModalOpen, setIsCreateFolderModalOpen] = useState(false);
   const [showSubBar, setShowSubBar] = useState(true);
   const { pathname } = useLocation();
+  const [selectedItems, setSelectedItems] = useState([]);
 
   useEffect(() => {
     if (isAuthenticated && user?.uid) {
@@ -53,13 +54,33 @@ const DashboardPage = () => {
 
       <Navbar />
       {showSubBar && (
-        <SubBar setIsCreateFileModalOpen={setIsCreateFileModalOpen} />
+        <SubBar 
+          setIsCreateFileModalOpen={setIsCreateFileModalOpen}
+          selectedItems={selectedItems}
+          setSelectedItems={setSelectedItems}
+        />
       )}
       
       <div className="container-fluid">
         <Routes>
-          <Route path="" element={<HomeComponents />} />
-          <Route path="folder/:folderId" element={<FolderComponent />} />
+          <Route 
+            path="" 
+            element={
+              <HomeComponents 
+                selectedItems={selectedItems}
+                setSelectedItems={setSelectedItems}
+              />
+            } 
+          />
+          <Route 
+            path="folder/:folderId" 
+            element={
+              <FolderComponent 
+                selectedItems={selectedItems}
+                setSelectedItems={setSelectedItems}
+              />
+            } 
+          />
           <Route path="file/:fileId" element={<FileComponent />} />
         </Routes>
       </div>
