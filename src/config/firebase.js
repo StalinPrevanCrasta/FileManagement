@@ -2,6 +2,7 @@
 import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
 import "firebase/compat/firestore";
+import "firebase/compat/storage";
 
 const firebaseConfig = {
   apiKey: "AIzaSyB7H1r4B-DZJuVIMsCJZ9V5gHc8xEuoh38",
@@ -13,7 +14,8 @@ const firebaseConfig = {
   measurementId: "G-C0NS79K17C"
 };
 
+// Initialize Firebase
 const fire = firebase.initializeApp(firebaseConfig);
 
-// Access Firebase services using `fire.auth()` with the compat SDK
+// Export the initialized Firebase instance
 export default fire;

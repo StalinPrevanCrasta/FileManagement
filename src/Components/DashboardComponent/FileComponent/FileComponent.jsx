@@ -13,6 +13,12 @@ const FileComponent = () => {
     return <div>File not found</div>;
   }
 
+  // Handle the URL to avoid CORS issues
+  const fileUrl = currentFile.data.url.replace(
+    'https://firebasestorage.googleapis.com',
+    '/storage'
+  );
+
   return (
     <div className="col-md-12 px-3 py-2">
       <div className="card">
@@ -21,8 +27,13 @@ const FileComponent = () => {
         </div>
         <div className="card-body">
           <div className="file-content">
-            {/* Add file content display logic here */}
-            <p>File content will be displayed here</p>
+            {currentFile.data.type.includes('image') ? (
+              <img src={fileUrl} alt={currentFile.data.name} style={{ maxWidth: '100%' }} />
+            ) : (
+              <a href={fileUrl} target="_blank" rel="noopener noreferrer" className="btn btn-primary">
+                Download {currentFile.data.name}
+              </a>
+            )}
           </div>
         </div>
       </div>
