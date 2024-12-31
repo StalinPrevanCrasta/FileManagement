@@ -2,6 +2,7 @@ import { shallowEqual, useSelector } from "react-redux";
 import { createSelector } from "reselect";
 import { useMemo } from "react"; 
 import ShowItems from "../ShowItems/ShowItems";
+import PropTypes from 'prop-types';
 
 // Memoized selector for folders and files
 const selectFileFolders = (state) => state.filefolders;
@@ -21,7 +22,7 @@ const makeSelectDerivedData = createSelector(
   })
 );
 
-const HomeComponents = () => {
+const HomeComponents = ({ selectedItems, setSelectedItems }) => {
   const { isLoading, userFolders, userFiles } = useSelector(
     makeSelectDerivedData,
     shallowEqual
@@ -53,16 +54,29 @@ const HomeComponents = () => {
         <h1 className="display-1 my-5 text-center">Loading.....</h1>
       ) : (
         <>
-          <ShowItems title={"Created Folders"} type={"folder"} items={uniqueFolders} />
+          <ShowItems 
+            title={"Created Folders"} 
+            type={"folder"} 
+            items={uniqueFolders}
+            selectedItems={selectedItems || []}
+            setSelectedItems={setSelectedItems}
+          />
           <ShowItems 
             title={"Created Files"} 
             type={"file"} 
-            items={filteredFiles} 
+            items={filteredFiles}
+            selectedItems={selectedItems || []}
+            setSelectedItems={setSelectedItems}
           />
         </>
       )}
     </div>
   );
+};
+
+HomeComponents.propTypes = {
+  selectedItems: PropTypes.array.isRequired,
+  setSelectedItems: PropTypes.func.isRequired,
 };
 
 export default HomeComponents;

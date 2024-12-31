@@ -1,30 +1,30 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFolder, faFileAlt } from "@fortawesome/free-solid-svg-icons";
+import { faFolder, faFileAlt, faCheck } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 import { changeFolder } from "../../../redux/actionCreators/filefolderActionCreator";
 import { useDispatch } from "react-redux";
 
-const ShowItems = ({ title, items, type }) => {
+const ShowItems = ({ title, items, type, selectedItems, setSelectedItems }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // Function to handle double-click event
   const handleDbClick = (item) => {
     if (type === "folder") {
       dispatch(changeFolder(item.docId));
       navigate(`/dashboard/folder/${item.docId}`);
     } else {
-      alert("File clicked");
+      navigate(`/dashboard/file/${item.docId}`);
     }
   };
 
-  const iconTextStyle = {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: "8px",
+  const handleSelect = (e, item) => {
+    e.stopPropagation();
+    if (selectedItems.find(i => i.docId === item.docId)) {
+      setSelectedItems(selectedItems.filter(i => i.docId !== item.docId));
+    } else {
+      setSelectedItems([...selectedItems, { ...item, type }]);
+    }
   };
 
   return (
@@ -34,26 +34,42 @@ const ShowItems = ({ title, items, type }) => {
         {items.map((item) => {
           const itemName = item.data?.name || "Unnamed";
           const itemId = item.docId;
+          const isSelected = selectedItems.some(i => i.docId === itemId);
 
           return (
             <div
               key={itemId}
-              className="col-md-2 py-3 text-center border rounded"
+              className={`col-md-2 py-3 text-center border rounded position-relative ${isSelected ? 'bg-light' : ''}`}
               onDoubleClick={() => handleDbClick(item)}
+              onClick={(e) => handleSelect(e, item)}
               style={{ cursor: "pointer" }}
             >
-              <div style={iconTextStyle}>
+              {isSelected && (
+                <div className="position-absolute top-0 end-0 p-2">
+                  <FontAwesomeIcon 
+                    icon={faCheck} 
+                    className="text-success"
+                  />
+                </div>
+              )}
+              <div style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "8px",
+              }}>
                 {type === "folder" ? (
                   <FontAwesomeIcon 
                     icon={faFolder} 
                     size="4x" 
-                    className="text-warning"
+                    className={`text-warning ${isSelected ? 'opacity-75' : ''}`}
                   />
                 ) : (
                   <FontAwesomeIcon 
                     icon={faFileAlt} 
                     size="4x" 
-                    className="text-primary"
+                    className={`text-primary ${isSelected ? 'opacity-75' : ''}`}
                   />
                 )}
                 <span className="mt-2">{itemName}</span>

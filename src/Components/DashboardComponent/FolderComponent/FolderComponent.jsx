@@ -3,8 +3,9 @@ import { useParams, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { changeFolder } from "../../../redux/actionCreators/filefolderActionCreator";
 import ShowItems from "../ShowItems/ShowItems";
+import PropTypes from 'prop-types';
 
-const FolderComponent = () => {
+const FolderComponent = ({ selectedItems, setSelectedItems }) => {
   const { folderId } = useParams();
   const dispatch = useDispatch();
   const [currentFolderName, setCurrentFolderName] = useState("Root");
@@ -88,16 +89,25 @@ const FolderComponent = () => {
         title={"Folders"}
         type={"folder"}
         items={childFolders}
+        selectedItems={selectedItems || []}
+        setSelectedItems={setSelectedItems}
       />
       {childFiles.length > 0 && (
         <ShowItems
           title={"Files"}
           type={"file"}
           items={childFiles}
+          selectedItems={selectedItems || []}
+          setSelectedItems={setSelectedItems}
         />
       )}
     </div>
   );
+};
+
+FolderComponent.propTypes = {
+  selectedItems: PropTypes.array.isRequired,
+  setSelectedItems: PropTypes.func.isRequired,
 };
 
 export default FolderComponent;

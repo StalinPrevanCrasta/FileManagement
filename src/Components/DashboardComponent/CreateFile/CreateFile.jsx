@@ -6,6 +6,7 @@ import { createFile } from "../../../redux/actionCreators/filefolderActionCreato
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import { useParams, useLocation } from "react-router-dom";
+import PropTypes from 'prop-types';
 
 const CreateFile = ({ setIsCreateFileModalOpen }) => {
   const [fileName, setFileName] = useState("");
@@ -98,6 +99,10 @@ const CreateFile = ({ setIsCreateFileModalOpen }) => {
       </div>
     </div>
   );
+};
+
+CreateFile.propTypes = {
+  setIsCreateFileModalOpen: PropTypes.func.isRequired,
 };
 
 export default CreateFile;
