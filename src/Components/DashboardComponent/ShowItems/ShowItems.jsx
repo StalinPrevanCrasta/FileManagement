@@ -2,7 +2,7 @@ import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFolder, faFileAlt } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
-import { changeFolder, moveFolder } from "../../../redux/actionCreators/filefolderActionCreator";
+import { changeFolder, moveFolder, moveFile } from "../../../redux/actionCreators/filefolderActionCreator";
 import { useDispatch } from "react-redux";
 
 const ShowItems = ({ title, items, type }) => {
@@ -21,13 +21,25 @@ const ShowItems = ({ title, items, type }) => {
 
   // Drag and drop handlers
   const handleDragStart = (e, item) => {
-    e.dataTransfer.setData("folderId", item.docId);
+    e.dataTransfer.setData("itemId", item.docId);
+    e.dataTransfer.setData("itemType", type);
+    console.log(`Dragging ${type} with ID: ${item.docId}`);
   };
 
   const handleDrop = (e) => {
-    const folderId = e.dataTransfer.getData("folderId");
-    const targetFolderId = e.currentTarget.dataset.id; // Assuming you set data-id on the target
-    dispatch(moveFolder(folderId, targetFolderId)); // Dispatch moveFolder action
+    const itemId = e.dataTransfer.getData("itemId");
+    const itemType = e.dataTransfer.getData("itemType");
+    const targetFolderId = e.currentTarget.dataset.id;
+
+    console.log(`Dropping ${itemType} with ID: ${itemId} into folder with ID: ${targetFolderId}`);
+
+    if (type === "folder") {
+      if (itemType === "folder") {
+        dispatch(moveFolder(itemId, targetFolderId));
+      } else if (itemType === "file") {
+        dispatch(moveFile(itemId, targetFolderId));
+      }
+    }
   };
 
   const iconTextStyle = {

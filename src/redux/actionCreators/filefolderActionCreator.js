@@ -1,6 +1,7 @@
 import * as types from "../actionsTypes/filefolderActionTypes";
 import fire from "../../config/firebase";
 import "firebase/compat/storage"; // Add this import
+import { MOVE_FILE } from "../actionsTypes/filefolderActionTypes";
 
 // Set Loading
 const setLoading = (status) => ({
@@ -235,5 +236,28 @@ export const moveFolder = (folderId, targetParentId) => async (dispatch) => {
     console.error("Error moving folder:", error);
     alert("Error moving folder. Please try again.");
     dispatch(setLoading(false));
+  }
+};
+
+export const moveFile = (fileId, targetFolderId) => async (dispatch, getState) => {
+  try {
+    const state = getState();
+    const file = state.filefolders.userFiles.find(file => file.docId === fileId);
+    if (!file) throw new Error("File not found");
+
+    console.log(`Moving file with ID: ${fileId} to folder with ID: ${targetFolderId}`);
+
+    await fire.firestore().collection("files").doc(fileId).update({
+      parent: targetFolderId
+    });
+
+    dispatch({
+      type: MOVE_FILE,
+      payload: { fileId, targetFolderId }
+    });
+
+    console.log(`File with ID: ${fileId} successfully moved to folder with ID: ${targetFolderId}`);
+  } catch (error) {
+    console.error("Error moving file:", error);
   }
 };
