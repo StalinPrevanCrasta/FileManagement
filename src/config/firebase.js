@@ -17,5 +17,7 @@ const firebaseConfig = {
 // Initialize Firebase
 const fire = firebase.initializeApp(firebaseConfig);
 
-// Export the initialized Firebase instance
+// Configure Storage
+const storage = fire.storage();
+
 export default fire;

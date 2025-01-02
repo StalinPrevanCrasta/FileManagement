@@ -8,6 +8,7 @@ import { useLocation } from "react-router-dom";
 const UploadFile = ({ setIsUploadFileModalOpen }) => {
   const [files, setFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef(null);
   const folderInputRef = useRef(null);
   const dispatch = useDispatch();
@@ -23,23 +24,25 @@ const UploadFile = ({ setIsUploadFileModalOpen }) => {
       const parent = location.pathname.includes('/folder/') ? currentFolder : "root";
       
       try {
-        // Upload all files
-        const uploadPromises = Array.from(files).map(file => {
-          // Preserve folder structure by using webkitRelativePath
-          const path = file.webkitRelativePath || file.name;
-          return dispatch(uploadFile(file, parent, user.uid, path));
-        });
+        let completed = 0;
+        const totalFiles = files.length;
 
-        const results = await Promise.all(uploadPromises);
-        
-        if (results.every(success => success)) {
-          setFiles([]);
-          setIsUploadFileModalOpen(false);
+        // Upload files sequentially to show proper progress
+        for (const file of Array.from(files)) {
+          const path = file.webkitRelativePath || file.name;
+          await dispatch(uploadFile(file, parent, user.uid, path));
+          completed++;
+          setUploadProgress((completed / totalFiles) * 100);
         }
+
+        setFiles([]);
+        setIsUploadFileModalOpen(false);
       } catch (error) {
         console.error("Upload error:", error);
+        alert("Error uploading files. Please try again.");
       } finally {
         setUploading(false);
+        setUploadProgress(0);
       }
     } else {
       alert("Please select files to upload");
@@ -48,7 +51,7 @@ const UploadFile = ({ setIsUploadFileModalOpen }) => {
 
   const handleFileChange = (e) => {
     const selectedFiles = e.target.files;
-    if (selectedFiles.length > 0) {
+    if (selectedFiles?.length > 0) {
       setFiles(selectedFiles);
     }
   };
@@ -116,7 +119,6 @@ const UploadFile = ({ setIsUploadFileModalOpen }) => {
               onChange={handleFileChange}
               webkitdirectory=""
               directory=""
-              multiple
               disabled={uploading}
             />
 
@@ -133,13 +135,30 @@ const UploadFile = ({ setIsUploadFileModalOpen }) => {
               </div>
             )}
 
+            {uploading && (
+              <div className="mb-3">
+                <div className="progress">
+                  <div 
+                    className="progress-bar" 
+                    role="progressbar" 
+                    style={{ width: `${uploadProgress}%` }}
+                    aria-valuenow={uploadProgress} 
+                    aria-valuemin="0" 
+                    aria-valuemax="100"
+                  >
+                    {Math.round(uploadProgress)}%
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="d-flex justify-content-end mt-3">
               <button 
                 type="submit" 
                 className="btn btn-primary me-2"
                 disabled={files.length === 0 || uploading}
               >
-                {uploading ? `Uploading ${files.length} item(s)...` : 'Upload'}
+                {uploading ? 'Uploading...' : 'Upload'}
               </button>
               <button
                 type="button"

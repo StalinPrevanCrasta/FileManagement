@@ -178,59 +178,56 @@ export const uploadFile = (file, parentId, userId, path = '') => async (dispatch
   try {
     dispatch(setLoading(true));
 
-    // Create a reference to Firebase Storage
     const storageRef = fire.storage().ref();
-    
-    // Use the full path if it's a folder upload, otherwise just the filename
     const storagePath = path || file.name;
     const fileRef = storageRef.child(`files/${userId}/${storagePath}`);
-    
-    // Set metadata
+
+    // Basic metadata
     const metadata = {
-      contentType: file.type,
-      customMetadata: {
+      contentType: file.type
+    };
+
+    try {
+      // Upload file
+      const snapshot = await fileRef.put(file, metadata);
+      
+      // Get URL
+      const url = await snapshot.ref.getDownloadURL();
+
+      // Add to Firestore
+      const fileData = {
+        name: file.name,
+        url: url,
+        userId: userId,
         parent: parentId,
-        userId: userId
-      }
-    };
+        createdAt: new Date(),
+        type: file.type,
+        path: storagePath,
+        content: ''
+      };
 
-    // Upload the file with metadata
-    const snapshot = await fileRef.put(file, metadata);
-    
-    // Get the download URL
-    const url = await snapshot.ref.getDownloadURL();
+      const fileRef2 = await fire.firestore().collection("files").add(fileData);
 
-    // Add file data to Firestore
-    const fileData = {
-      name: file.name,
-      url: url,
-      userId: userId,
-      parent: parentId,
-      createdAt: new Date(),
-      type: file.type,
-      path: storagePath
-    };
+      dispatch({
+        type: types.CREATE_FILE,
+        payload: {
+          data: fileData,
+          docId: fileRef2.id
+        }
+      });
 
-    const fileRef2 = await fire.firestore().collection("files").add(fileData);
+      dispatch(setLoading(false));
+      return true;
 
-    // Create file object for Redux
-    const newFile = {
-      data: fileData,
-      docId: fileRef2.id
-    };
+    } catch (uploadError) {
+      console.error("Upload error:", uploadError);
+      throw uploadError;
+    }
 
-    // Dispatch to Redux store
-    dispatch({
-      type: types.CREATE_FILE,
-      payload: newFile
-    });
-
-    dispatch(setLoading(false));
-    return true;
   } catch (error) {
-    console.error("Error uploading file:", error);
+    console.error("Error in uploadFile:", error);
     dispatch(setLoading(false));
-    return false;
+    throw error;
   }
 };
 
@@ -335,5 +332,42 @@ export const deleteFile = (fileId) => async (dispatch) => {
     console.error("Error deleting file:", error);
     alert("Error deleting file. Please try again.");
     dispatch(setLoading(false));
+  }
+};
+
+// Add this new action
+export const updateFileContent = (fileId, content) => async (dispatch, getState) => {
+  try {
+    dispatch(setLoading(true));
+    const state = getState();
+    const file = state.filefolders.userFiles.find(f => f.docId === fileId);
+    
+    if (!file) throw new Error("File not found");
+
+    // Update Firestore with the content
+    await fire.firestore().collection("files").doc(fileId).update({
+      content: content,
+      updatedAt: new Date()
+    });
+
+    // Update Redux state
+    dispatch({
+      type: types.UPDATE_FILE,
+      payload: {
+        docId: fileId,
+        data: {
+          ...file.data,
+          content: content,
+          updatedAt: new Date()
+        }
+      }
+    });
+
+    dispatch(setLoading(false));
+    return true;
+  } catch (error) {
+    console.error("Error updating file:", error);
+    dispatch(setLoading(false));
+    throw error;
   }
 };

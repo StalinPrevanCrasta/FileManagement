@@ -1,6 +1,6 @@
 import React from "react";
-import { signInUser } from "../../redux/actionCreators/authActionCreator";
 import { useDispatch } from "react-redux";
+import { signInUser } from "../../redux/actionCreators/authActionCreator";
 import { useNavigate } from "react-router-dom";
 
 const LoginForm = () => {
@@ -16,7 +16,8 @@ const LoginForm = () => {
       alert("Please fill all the fields");
       return;
     }
-    
+
+    // Dispatching login action
     dispatch(signInUser(email, password, setSuccess));
   };
 
@@ -27,28 +28,48 @@ const LoginForm = () => {
   }, [success, navigate]);
 
   return (
-    <form autoComplete="off" onSubmit={handleSubmit}>
-      <div className="form-group my-2">
+    <form autoComplete="off" onSubmit={handleSubmit} style={{ maxWidth: "400px", margin: "0 auto" }}>
+      <div className="form-group mb-4">
+        <label htmlFor="emailInput" className="form-label" style={{ fontWeight: "bold", color: "#5369f8" }}>
+          Email Address
+        </label>
         <input
           type="email"
-          name="email"
           className="form-control"
-          placeholder="Email"
+          id="emailInput"
+          placeholder="Enter your email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          style={{
+            padding: "10px",
+            border: "1px solid #ccc",
+            borderRadius: "5px",
+            fontSize: "16px",
+          }}
         />
       </div>
-      <div className="form-group my-2">
+
+      <div className="form-group mb-4">
+        <label htmlFor="passwordInput" className="form-label" style={{ fontWeight: "bold", color: "#5369f8" }}>
+          Password
+        </label>
         <input
           type="password"
-          name="password"
           className="form-control"
-          placeholder="Password"
+          id="passwordInput"
+          placeholder="Enter your password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          style={{
+            padding: "10px",
+            border: "1px solid #ccc",
+            borderRadius: "5px",
+            fontSize: "16px",
+          }}
         />
       </div>
-      <button type="submit" className="btn btn-primary my-2 form-control">
+
+      <button type="submit" className="btn btn-theme w-100">
         Login
       </button>
     </form>
