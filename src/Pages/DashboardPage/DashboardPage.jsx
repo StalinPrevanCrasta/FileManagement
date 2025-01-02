@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import styled, { createGlobalStyle, keyframes } from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 import { getFolders, getFiles } from "../../redux/actionCreators/filefolderActionCreator";
 import { Route, Routes, useLocation } from "react-router-dom";
@@ -9,6 +10,73 @@ import FolderComponent from "../../Components/DashboardComponent/FolderComponent
 import CreateFolder from "../../Components/DashboardComponent/CreateFolder/CreateFolder";
 import CreateFile from "../../Components/DashboardComponent/CreateFile/CreateFile";
 import FileComponent from "../../Components/DashboardComponent/FileComponent/FileComponent";
+
+const GlobalStyle = createGlobalStyle`
+  body {
+    background: #121212;
+    color: #ffffff;
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+`;
+
+const gradientAnimation = keyframes`
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+`;
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+`;
+
+const NavbarWrapper = styled.div`
+  background: linear-gradient(45deg, #1e1e2f, #343a40);
+  padding: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+`;
+
+const SubBarWrapper = styled.div`
+  background: #1c1c28;
+  border-bottom: 1px solid #333;
+  padding: 10px;
+`;
+
+const HeaderText = styled.h1`
+  font-size: 28px;
+  font-weight: 800;
+  text-align: center;
+  color: #ff6a00;
+  margin: 20px 0;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+`;
+
+const MovingText = styled.h1`
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+  margin: 20px 0;
+  background: linear-gradient(90deg, #ff6a00, #ee0979);
+  background-size: 200% 200%;
+  animation: ${gradientAnimation} 5s ease infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+`;
+
+const ContentWrapper = styled.div`
+  flex: 1;
+  background: #1a1a24;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.7);
+  overflow-y: auto;
+  padding: 20px;
+  margin: 20px;
+`;
 
 const DashboardPage = () => {
   const dispatch = useDispatch();
@@ -27,91 +95,12 @@ const DashboardPage = () => {
   }, [dispatch, isAuthenticated, user]);
 
   useEffect(() => {
-    if (pathname.includes('/file/')) {
-      setShowSubBar(false);
-    } else {
-      setShowSubBar(true);
-    }
+    setShowSubBar(!pathname.includes("/file/"));
   }, [pathname]);
-
-  const styles = {
-    container: {
-      minHeight: '100vh',
-      background: 'linear-gradient(135deg, #0f2027, #203a43, #2c5364)',
-      color: '#fff',
-      fontFamily: 'Poppins, sans-serif',
-      padding: '1rem',
-    },
-    button: {
-      backgroundColor: '#ff6f61',
-      border: 'none',
-      color: '#fff',
-      padding: '0.8rem 1.5rem',
-      borderRadius: '50px',
-      cursor: 'pointer',
-      fontSize: '1rem',
-      transition: 'all 0.4s ease',
-      boxShadow: '0 8px 15px rgba(255, 111, 97, 0.4)',
-    },
-    buttonHover: {
-      transform: 'scale(1.15)',
-      boxShadow: '0 10px 20px rgba(255, 111, 97, 0.6)',
-    },
-    navbar: {
-      backgroundColor: '#16213e',
-      padding: '1rem',
-      boxShadow: '0 6px 15px rgba(0, 0, 0, 0.3)',
-      marginBottom: '1.5rem',
-    },
-    subBar: {
-      backgroundColor: '#1b1b2f',
-      padding: '1rem',
-      marginBottom: '1.5rem',
-      borderRadius: '10px',
-      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-      animation: 'fadeIn 1s ease-in-out',
-    },
-    card: {
-      backgroundColor: '#1e3a8a',
-      borderRadius: '15px',
-      padding: '2rem',
-      marginBottom: '1rem',
-      color: '#fff',
-      transition: 'transform 0.4s ease, box-shadow 0.4s ease',
-      boxShadow: '0 4px 15px rgba(30, 58, 138, 0.4)',
-    },
-    cardHover: {
-      transform: 'scale(1.1)',
-      boxShadow: '0 6px 20px rgba(30, 58, 138, 0.6)',
-    },
-    fadeIn: {
-      animation: 'fadeIn 1s ease-in-out',
-    },
-    movingText: {
-      fontSize: '2rem',
-      fontWeight: 'bold',
-      textAlign: 'center',
-      margin: '2rem 0',
-      color: '#ff6f61',
-      animation: 'moveText 5s linear infinite',
-    },
-    '@keyframes moveText': {
-      '0%': { transform: 'translateX(-100%)' },
-      '50%': { transform: 'translateX(0)' },
-      '100%': { transform: 'translateX(100%)' },
-    },
-    '@keyframes fadeIn': {
-      from: {
-        opacity: 0,
-      },
-      to: {
-        opacity: 1,
-      },
-    },
-  };
 
   return (
     <>
+      <GlobalStyle />
       {isCreateFolderModalOpen && (
         <CreateFolder
           setIsCreateFolderModalOpen={setIsCreateFolderModalOpen}
@@ -121,43 +110,46 @@ const DashboardPage = () => {
         <CreateFile setIsCreateFileModalOpen={setIsCreateFileModalOpen} />
       )}
 
-      <div style={styles.navbar}>
-        <Navbar />
-      </div>
-      {showSubBar && (
-        <div style={styles.subBar}>
-          <SubBar 
-            setIsCreateFileModalOpen={setIsCreateFileModalOpen}
-            selectedItems={selectedItems}
-            setSelectedItems={setSelectedItems}
-          />
-        </div>
-      )}
+      <Container>
+        <HeaderText>DOCUSPHERE</HeaderText>
+        <NavbarWrapper>
+          <Navbar />
+        </NavbarWrapper>
+        {showSubBar && (
+          <SubBarWrapper>
+            <SubBar
+              setIsCreateFileModalOpen={setIsCreateFileModalOpen}
+              selectedItems={selectedItems}
+              setSelectedItems={setSelectedItems}
+            />
+          </SubBarWrapper>
+        )}
 
-      <div style={styles.container}>
-        <div style={styles.movingText}>Welcome to Your Dashboard</div>
-        <Routes>
-          <Route 
-            path="" 
-            element={
-              <HomeComponents 
-                selectedItems={selectedItems}
-                setSelectedItems={setSelectedItems}
-              />
-            } 
-          />
-          <Route 
-            path="folder/:folderId" 
-            element={
-              <FolderComponent 
-                selectedItems={selectedItems}
-                setSelectedItems={setSelectedItems}
-              />
-            } 
-          />
-          <Route path="file/:fileId" element={<FileComponent />} />
-        </Routes>
-      </div>
+        <MovingText>Welcome to Your Dashboard</MovingText>
+        <ContentWrapper>
+          <Routes>
+            <Route
+              path=""
+              element={
+                <HomeComponents
+                  selectedItems={selectedItems}
+                  setSelectedItems={setSelectedItems}
+                />
+              }
+            />
+            <Route
+              path="folder/:folderId"
+              element={
+                <FolderComponent
+                  selectedItems={selectedItems}
+                  setSelectedItems={setSelectedItems}
+                />
+              }
+            />
+            <Route path="file/:fileId" element={<FileComponent />} />
+          </Routes>
+        </ContentWrapper>
+      </Container>
     </>
   );
 };
