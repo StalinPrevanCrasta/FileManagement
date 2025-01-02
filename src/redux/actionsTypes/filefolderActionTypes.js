@@ -9,3 +9,4 @@ export const MOVE_FOLDER = 'MOVE_FOLDER';
 export const MOVE_FILE = 'MOVE_FILE';
 export const DELETE_FOLDER = "DELETE_FOLDER";
 export const DELETE_FILE = "DELETE_FILE";
+export const UPDATE_FILE = "UPDATE_FILE";
