@@ -1,127 +1,40 @@
-/* General Navbar Styling */
+/* SubBar.css */
 .navbar {
-  background-color: #000000;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
-  color: #ffffff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
-  padding: 15px 20px;
-  border-radius: 8px;
+  background-color: #1a1a1a; /* Dark background for navbar */
 }
 
-.navbar-brand {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #ffffff;
-  text-transform: uppercase;
-  text-shadow: 0 0 5px rgba(255, 255, 255, 0.6);
-  margin-right: auto;
-}
-
-.navbar-brand:hover {
-  color: #f0e68c;
-  text-shadow: 0 0 10px #ffd700;
-}
-
-/* Breadcrumb Styling */
-.breadcrumb {
-  background-color: transparent;
-  font-size: 1rem;
+.navbar-nav .nav-item .btn {
+  color: #ffffff; /* White text for buttons */
+  background-color: transparent; /* Transparent background */
+  border: 2px solid #ffffff; /* White border */
   font-weight: 500;
+  padding: 8px 15px;
+  border-radius: 20px;
+  transition: all 0.3s ease;
 }
 
-.breadcrumb-item a {
-  color: #f9f9f9;
-  text-decoration: none;
-}
-
-.breadcrumb-item a:hover {
-  color: #ffd700;
-}
-
-.breadcrumb-item.active {
-  color: #f0e68c;
-  font-weight: bold;
-}
-
-/* Button Styling */
-.btn {
-  font-size: 1rem;
-  font-weight: bold;
-  padding: 12px 20px;
-  border-radius: 12px;
-  border-width: 2px;
-  transition: all 0.3s ease-in-out;
-  display: flex;
-  align-items: center;
-  gap: 10px; /* Spacing between icon and text */
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-}
-
-.btn-outline-dark {
-  background: #1d1d1d;
-  color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.btn-outline-dark:hover {
-  background: #444444;
-  color: #f9f9f9;
+.navbar-nav .nav-item .btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.5);
+  box-shadow: 0px 4px 15px rgba(255, 255, 255, 0.3); /* Subtle hover effect with white shadow */
 }
 
-.btn-outline-danger {
-  background: #ff4b2b;
-  color: #ffffff;
-  border: none;
+.navbar-nav .nav-item .btn-outline-dark {
+  color: #ffffff; /* White text for dark outline buttons */
+  border-color: #ffffff; /* White border */
 }
 
-.btn-outline-danger:hover {
-  background: #e73827;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.5);
+.navbar-nav .nav-item .btn-outline-dark:hover {
+  background-color: #ffffff;
+  color: #1a1a1a; /* Dark text on hover */
 }
 
-/* Disabled Button */
-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
+/* Specific styling for Delete button */
+.navbar-nav .nav-item .btn-outline-danger {
+  color: #ffffff; /* White text for delete button */
+  border-color: #ff4d4d; /* Red border for delete button */
 }
 
-/* Modal Overlays */
-.modal-backdrop {
-  background-color: rgba(0, 0, 0, 0.8);
-}
-
-.modal-content {
-  border-radius: 15px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
-}
-
-/* Hover Effects */
-.btn:hover {
-  transform: translateY(-2px);
-}
-
-.btn:focus {
-  outline: none;
-  box-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .navbar-nav {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .nav-item {
-    margin-bottom: 10px;
-  }
-
-  .breadcrumb {
-    font-size: 0.85rem;
-  }
+.navbar-nav .nav-item .btn-outline-danger:hover {
+  background-color: #ff4d4d; /* Red background on hover */
+  color: #ffffff; /* White text on hover */
 }

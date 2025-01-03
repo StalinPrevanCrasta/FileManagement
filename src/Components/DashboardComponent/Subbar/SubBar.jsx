@@ -37,14 +37,17 @@ const SubBar = ({ setIsCreateFileModalOpen, selectedItems, setSelectedItems }) =
   return (
     <>
       <nav className="navbar navbar-expand-lg mt-2 navbar-light bg-black py-2 px-5">
-        <span className="navbar-brand">Docusphere</span>
         <nav className="ms-5" aria-label="breadcrumb">
           <ol className="breadcrumb d-flex align-items-center">
             <li className="breadcrumb-item">
-              <Link to="/dashboard">Root</Link>
+              <Link to="/dashboard" style={{ color: "lightblue" }}> {/* Changed Root color to light blue */}
+                Root
+              </Link>
             </li>
             {location.pathname !== "/dashboard" && (
-              <li className="breadcrumb-item active">{folderId}</li>
+              <li className="breadcrumb-item active" style={{ color: "purple" }}>
+                {folderId}
+              </li>
             )}
           </ol>
         </nav>
@@ -52,7 +55,7 @@ const SubBar = ({ setIsCreateFileModalOpen, selectedItems, setSelectedItems }) =
         <ul className="navbar-nav ms-auto me-5">
           <li className="nav-item mx-2">
             <button
-              className="btn btn-outline-danger"
+              className="btn btn-outline-danger custom-btn"
               onClick={handleDelete}
               disabled={selectedItems.length === 0}
             >
@@ -62,7 +65,7 @@ const SubBar = ({ setIsCreateFileModalOpen, selectedItems, setSelectedItems }) =
           </li>
           <li className="nav-item mx-2">
             <button
-              className="btn btn-outline-dark"
+              className="btn btn-outline-dark custom-btn"
               onClick={() => setIsUploadFileModalOpen(true)}
             >
               <FontAwesomeIcon icon={faFileUpload} />
@@ -71,7 +74,7 @@ const SubBar = ({ setIsCreateFileModalOpen, selectedItems, setSelectedItems }) =
           </li>
           <li className="nav-item mx-2">
             <button
-              className="btn btn-outline-dark"
+              className="btn btn-outline-dark custom-btn"
               onClick={() => setIsCreateFileModalOpen(true)}
             >
               <FontAwesomeIcon icon={faFileAlt} />
@@ -80,7 +83,7 @@ const SubBar = ({ setIsCreateFileModalOpen, selectedItems, setSelectedItems }) =
           </li>
           <li className="nav-item ms-2">
             <button
-              className="btn btn-outline-dark"
+              className="btn btn-outline-dark custom-btn"
               onClick={() => setIsCreateFolderModalOpen(true)}
             >
               <FontAwesomeIcon icon={faFolderPlus} />

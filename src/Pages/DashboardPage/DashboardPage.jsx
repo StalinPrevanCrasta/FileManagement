@@ -137,6 +137,11 @@ const DashboardPage = () => {
         .modal-footer .btn:hover {
           background-color: #555555;
         }
+
+        /* Added custom styles for Create Folder and Create File text */
+        .create-text {
+          color: lightblue;
+        }
       `}</style>
 
       {isCreateFolderModalOpen && (
