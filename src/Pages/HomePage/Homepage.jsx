@@ -1,28 +1,13 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import CloudinaryImage from '../../Components/CloudinaryImage/CloudinaryImage';
 
-const Homepage = () => {
-  const navigate = useNavigate();
-
+const HomePage = () => {
   return (
-    <div className="home-container">
-      {/* Navigation Bar */}
-      <nav className="navbar">
-        <div className="navbar-links">
-          {/* Removed Dashboard and Logout buttons */}
-        </div>
-      </nav>
-
-      {/* Main Content */}
-      <div className="content">
-        <h1 className="heading">DOCUSPHERE</h1>
-        <div className="button-container">
-          <button className="main-button" onClick={() => navigate('/login')}>Login</button>
-          <button className="main-button" onClick={() => navigate('/register')}>Register</button>
-        </div>
-      </div>
+    <div>
+      <h1>Welcome to File Management System</h1>
+      <CloudinaryImage imageId="cld-sample-5" />
     </div>
   );
 };
 
-export default Homepage;
+export default HomePage;

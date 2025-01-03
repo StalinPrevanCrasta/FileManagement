@@ -8,13 +8,12 @@ import  {Login, Register, Homepage, DashboardPage} from './Pages';
 import { useDispatch } from 'react-redux';
 import { checkIsLoggedIn } from './redux/actionCreators/authActionCreator';
 
-
 const App = () => {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(checkIsLoggedIn());
+  }, [dispatch]);
 
-  }, []);
   return (
     <div className='App'>
       <Routes>
