@@ -1,11 +1,14 @@
 import { configureStore } from '@reduxjs/toolkit';
-import rootReducer from './reducers/index';
+import authReducer from './reducers/authReducer';
+import fileFolderReducer from './reducers/fileFolderReducer';
 
-const store = configureStore({
-  reducer: rootReducer,
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware({
-    serializableCheck: false
-  })
+export const store = configureStore({
+  reducer: {
+    auth: authReducer,
+    filefolders: fileFolderReducer
+  },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false
+    })
 });
-
-export default store;
