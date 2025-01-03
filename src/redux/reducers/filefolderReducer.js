@@ -81,16 +81,6 @@ const fileFolderReducer = (state = initialState, action) => {
         ),
       };
 
-    case types.UPDATE_FILE:
-      return {
-        ...state,
-        userFiles: state.userFiles.map((file) =>
-          file.docId === action.payload.docId
-            ? { ...file, data: action.payload.data }
-            : file
-        ),
-      };
-
     default:
       return state;
   }
