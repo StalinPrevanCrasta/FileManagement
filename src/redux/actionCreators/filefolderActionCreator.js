@@ -371,3 +371,79 @@ export const updateFileContent = (fileId, content) => async (dispatch, getState)
     throw error;
   }
 };
+
+// Copy folder with new name
+export const copyFolder = (folderId, targetParentId) => async (dispatch, getState) => {
+  try {
+    dispatch(setLoading(true));
+    const state = getState();
+    const folder = state.filefolders.userFolders.find(f => f.docId === folderId);
+    
+    if (!folder) throw new Error("Folder not found");
+
+    // Create new folder data with copied suffix
+    const newFolderData = {
+      ...folder.data,
+      name: `${folder.data.name} (copy)`,
+      parent: targetParentId,
+      createdAt: new Date()
+    };
+
+    // Add new folder to Firestore
+    const folderRef = await fire.firestore().collection("folders").add(newFolderData);
+
+    // Dispatch to Redux
+    dispatch({
+      type: types.CREATE_FOLDER,
+      payload: {
+        data: newFolderData,
+        docId: folderRef.id
+      }
+    });
+
+    dispatch(setLoading(false));
+    return folderRef.id;
+  } catch (error) {
+    console.error("Error copying folder:", error);
+    dispatch(setLoading(false));
+    throw error;
+  }
+};
+
+// Copy file with new name
+export const copyFile = (fileId, targetParentId) => async (dispatch, getState) => {
+  try {
+    dispatch(setLoading(true));
+    const state = getState();
+    const file = state.filefolders.userFiles.find(f => f.docId === fileId);
+    
+    if (!file) throw new Error("File not found");
+
+    // Create new file data with copied suffix
+    const newFileData = {
+      ...file.data,
+      name: `${file.data.name} (copy)`,
+      parent: targetParentId,
+      createdAt: new Date()
+    };
+
+    // Add new file to Firestore
+    const fileRef = await fire.firestore().collection("files").add(newFileData);
+
+    // Dispatch to Redux
+    dispatch({
+      type: types.CREATE_FILE,
+      payload: {
+        data: newFileData,
+        docId: fileRef.id
+      }
+    });
+
+    dispatch(setLoading(false));
+    return fileRef.id;
+  } catch (error) {
+    console.error("Error copying file:", error);
+    dispatch(setLoading(false));
+    throw error;
+  }
+};
