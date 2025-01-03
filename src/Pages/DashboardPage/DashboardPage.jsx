@@ -43,6 +43,102 @@ const DashboardPage = () => {
 
   return (
     <>
+      <style>{`
+        body {
+          background-color: #0f0f0f;
+          color: #e0e0e0;
+          font-family: 'Roboto', sans-serif;
+          margin: 0;
+          padding: 0;
+        }
+
+        .container-fluid {
+          margin-top: 20px;
+          padding: 20px;
+          background-color: #181818;
+          border-radius: 8px;
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .container-fluid h1, h2, h3, h4, h5, h6 {
+          color: #f39c12;
+        }
+
+        .btn {
+          background-color: #f39c12;
+          border: none;
+          color: #fff;
+          font-weight: bold;
+          transition: all 0.3s ease-in-out;
+        }
+
+        .btn:hover {
+          background-color: #d35400;
+          transform: translateY(-2px);
+        }
+
+        .card {
+          background-color: #202020;
+          color: #e0e0e0;
+          border: 1px solid #333333;
+          border-radius: 8px;
+          transition: transform 0.2s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+        }
+
+        .nav-link {
+          color: #e0e0e0;
+          font-weight: 500;
+          transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+          color: #f39c12;
+        }
+
+        .breadcrumb {
+          background-color: #121212;
+          border-radius: 8px;
+          padding: 10px;
+        }
+
+        .breadcrumb-item a {
+          color: #f39c12;
+        }
+
+        .breadcrumb-item a:hover {
+          color: #ffffff;
+          text-decoration: underline;
+        }
+
+        .modal-content {
+          background-color: #222222;
+          color: #e0e0e0;
+          border: 1px solid #333333;
+        }
+
+        .modal-header, .modal-footer {
+          border-color: #444444;
+        }
+
+        .modal-header h5 {
+          color: #f39c12;
+        }
+
+        .modal-footer .btn {
+          background-color: #333333;
+          border: none;
+        }
+
+        .modal-footer .btn:hover {
+          background-color: #555555;
+        }
+      `}</style>
+
       {isCreateFolderModalOpen && (
         <CreateFolder
           setIsCreateFolderModalOpen={setIsCreateFolderModalOpen}
@@ -60,7 +156,7 @@ const DashboardPage = () => {
           setSelectedItems={setSelectedItems}
         />
       )}
-      
+
       <div className="container-fluid">
         <Routes>
           <Route 
