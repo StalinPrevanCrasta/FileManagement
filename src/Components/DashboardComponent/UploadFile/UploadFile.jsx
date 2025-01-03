@@ -4,6 +4,7 @@ import { uploadFile } from "../../../redux/actionCreators/filefolderActionCreato
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes, faFileUpload, faFolderOpen } from "@fortawesome/free-solid-svg-icons";
 import { useLocation } from "react-router-dom";
+import { toast } from 'react-toastify';
 
 const UploadFile = ({ setIsUploadFileModalOpen }) => {
   const [files, setFiles] = useState([]);
@@ -17,6 +18,36 @@ const UploadFile = ({ setIsUploadFileModalOpen }) => {
   const { user } = useSelector(state => state.auth);
   const { currentFolder } = useSelector(state => state.filefolders);
 
+  const uploadToCloudinary = async (file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "ml_default");
+    formData.append("folder", `file-manager/${user.uid}`);
+
+    try {
+      const response = await fetch(
+        "https://api.cloudinary.com/v1_1/dfrhhnpxv/upload",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Cloudinary Error Response:', errorData);
+        throw new Error(errorData.error?.message || 'Failed to upload to Cloudinary');
+      }
+
+      const data = await response.json();
+      console.log('Cloudinary Upload Success:', data);
+      return data;
+    } catch (error) {
+      console.error("Error uploading to Cloudinary:", error);
+      throw error;
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (files.length > 0) {
@@ -25,34 +56,80 @@ const UploadFile = ({ setIsUploadFileModalOpen }) => {
       
       try {
         let completed = 0;
+        let failed = 0;
         const totalFiles = files.length;
 
         // Upload files sequentially to show proper progress
         for (const file of Array.from(files)) {
-          const path = file.webkitRelativePath || file.name;
-          await dispatch(uploadFile(file, parent, user.uid, path));
-          completed++;
-          setUploadProgress((completed / totalFiles) * 100);
+          try {
+            const path = file.webkitRelativePath || file.name;
+            
+            // First upload to Cloudinary
+            const cloudinaryData = await uploadToCloudinary(file);
+            
+            // Then create file record in Firebase
+            const fileData = {
+              name: file.name,
+              url: cloudinaryData.secure_url,
+              userId: user.uid,
+              parent: parent,
+              createdAt: new Date(),
+              type: file.type,
+              path: path,
+              content: '',
+              cloudinaryPublicId: cloudinaryData.public_id,
+              size: cloudinaryData.bytes,
+              format: cloudinaryData.format
+            };
+
+            await dispatch(uploadFile(fileData));
+            
+            completed++;
+            setUploadProgress((completed / totalFiles) * 100);
+            toast.success(`Successfully uploaded ${file.name}`);
+          } catch (error) {
+            console.error(`Error uploading file ${file.name}:`, error);
+            failed++;
+            toast.error(`Failed to upload ${file.name}: ${error.message}`);
+          }
         }
 
         setFiles([]);
-        setIsUploadFileModalOpen(false);
+        if (failed === 0) {
+          setIsUploadFileModalOpen(false);
+          toast.success("All files uploaded successfully!");
+        } else {
+          toast.warning(`Upload completed with ${failed} failed files out of ${totalFiles}`);
+        }
       } catch (error) {
         console.error("Upload error:", error);
-        alert("Error uploading files. Please try again.");
+        toast.error("Error during upload process. Please try again.");
       } finally {
         setUploading(false);
         setUploadProgress(0);
       }
     } else {
-      alert("Please select files to upload");
+      toast.warning("Please select files to upload");
     }
   };
 
   const handleFileChange = (e) => {
     const selectedFiles = e.target.files;
     if (selectedFiles?.length > 0) {
-      setFiles(selectedFiles);
+      // Validate file types and sizes
+      const validFiles = Array.from(selectedFiles).filter(file => {
+        const maxSize = 10 * 1024 * 1024; // 10MB max size
+        if (file.size > maxSize) {
+          toast.warning(`File ${file.name} is too large. Maximum size is 10MB`);
+          return false;
+        }
+        return true;
+      });
+
+      setFiles(validFiles);
+      if (validFiles.length > 0) {
+        toast.info(`Selected ${validFiles.length} files for upload`);
+      }
     }
   };
 
@@ -110,6 +187,7 @@ const UploadFile = ({ setIsUploadFileModalOpen }) => {
               onChange={handleFileChange}
               disabled={uploading}
               multiple
+              accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx,.txt"
             />
             
             <input

@@ -2,6 +2,7 @@ import * as types from "../actionsTypes/filefolderActionTypes";
 import fire from "../../config/firebase";
 import "firebase/compat/storage"; // Add this import
 import { MOVE_FILE } from "../actionsTypes/filefolderActionTypes";
+import cloudinaryConfig from "../../config/cloudinary";
 
 // Set Loading
 const setLoading = (status) => ({
@@ -126,8 +127,8 @@ export const getFolders = (userId) => async (dispatch) => {
   try {
     dispatch(setLoading(true));
     const folders = await fire
-      .firestore()
-      .collection("folders")
+    .firestore()
+    .collection("folders")
       .where("userId", "==", userId)
       .get();
 
@@ -174,55 +175,23 @@ export const getFiles = (userId) => async (dispatch) => {
 };
 
 // Upload File
-export const uploadFile = (file, parentId, userId, path = '') => async (dispatch) => {
+export const uploadFile = (fileData) => async (dispatch) => {
   try {
     dispatch(setLoading(true));
 
-    const storageRef = fire.storage().ref();
-    const storagePath = path || file.name;
-    const fileRef = storageRef.child(`files/${userId}/${storagePath}`);
+    // Add to Firestore
+    const fileRef = await fire.firestore().collection("files").add(fileData);
 
-    // Basic metadata
-    const metadata = {
-      contentType: file.type
-    };
+    dispatch({
+      type: types.CREATE_FILE,
+      payload: {
+        data: fileData,
+        docId: fileRef.id
+      }
+    });
 
-    try {
-      // Upload file
-      const snapshot = await fileRef.put(file, metadata);
-      
-      // Get URL
-      const url = await snapshot.ref.getDownloadURL();
-
-      // Add to Firestore
-      const fileData = {
-        name: file.name,
-        url: url,
-        userId: userId,
-        parent: parentId,
-        createdAt: new Date(),
-        type: file.type,
-        path: storagePath,
-        content: ''
-      };
-
-      const fileRef2 = await fire.firestore().collection("files").add(fileData);
-
-      dispatch({
-        type: types.CREATE_FILE,
-        payload: {
-          data: fileData,
-          docId: fileRef2.id
-        }
-      });
-
-      dispatch(setLoading(false));
-      return true;
-
-    } catch (uploadError) {
-      console.error("Upload error:", uploadError);
-      throw uploadError;
-    }
+    dispatch(setLoading(false));
+    return true;
 
   } catch (error) {
     console.error("Error in uploadFile:", error);
@@ -307,14 +276,30 @@ export const deleteFile = (fileId) => async (dispatch) => {
   try {
     dispatch(setLoading(true));
 
-    // Get file data first to get the storage URL
+    // Get file data first to get the Cloudinary public ID
     const fileDoc = await fire.firestore().collection("files").doc(fileId).get();
     const fileData = fileDoc.data();
 
-    if (fileData && fileData.url) {
-      // Delete from Storage
-      const fileRef = fire.storage().refFromURL(fileData.url);
-      await fileRef.delete();
+    if (fileData && fileData.cloudinaryPublicId) {
+      // Delete from Cloudinary
+      const timestamp = Math.round((new Date()).getTime() / 1000);
+      const signature = generateCloudinarySignature(fileData.cloudinaryPublicId, timestamp);
+      
+      await fetch(
+        `https://api.cloudinary.com/v1_1/dfrhhnpxv/image/destroy`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            public_id: fileData.cloudinaryPublicId,
+            signature: signature,
+            api_key: 'your-cloudinary-api-key',
+            timestamp: timestamp,
+          }),
+        }
+      );
     }
 
     // Delete from Firestore
@@ -333,6 +318,13 @@ export const deleteFile = (fileId) => async (dispatch) => {
     alert("Error deleting file. Please try again.");
     dispatch(setLoading(false));
   }
+};
+
+// Helper function to generate Cloudinary signature
+const generateCloudinarySignature = (publicId, timestamp) => {
+  // You'll need to implement this function using your Cloudinary API secret
+  // The signature should be generated on your backend for security
+  return 'signature';
 };
 
 // Add this new action
@@ -367,6 +359,82 @@ export const updateFileContent = (fileId, content) => async (dispatch, getState)
     return true;
   } catch (error) {
     console.error("Error updating file:", error);
+    dispatch(setLoading(false));
+    throw error;
+  }
+};
+
+// Copy folder with new name
+export const copyFolder = (folderId, targetParentId) => async (dispatch, getState) => {
+  try {
+    dispatch(setLoading(true));
+    const state = getState();
+    const folder = state.filefolders.userFolders.find(f => f.docId === folderId);
+    
+    if (!folder) throw new Error("Folder not found");
+
+    // Create new folder data with copied suffix
+    const newFolderData = {
+      ...folder.data,
+      name: `${folder.data.name} (copy)`,
+      parent: targetParentId === null ? "root" : targetParentId,
+      createdAt: new Date()
+    };
+
+    // Add new folder to Firestore
+    const folderRef = await fire.firestore().collection("folders").add(newFolderData);
+
+    // Dispatch to Redux
+    dispatch({
+      type: types.CREATE_FOLDER,
+      payload: {
+        data: newFolderData,
+        docId: folderRef.id
+      }
+    });
+
+    dispatch(setLoading(false));
+    return folderRef.id;
+  } catch (error) {
+    console.error("Error copying folder:", error);
+    dispatch(setLoading(false));
+    throw error;
+  }
+};
+
+// Copy file with new name
+export const copyFile = (fileId, targetParentId) => async (dispatch, getState) => {
+  try {
+    dispatch(setLoading(true));
+    const state = getState();
+    const file = state.filefolders.userFiles.find(f => f.docId === fileId);
+    
+    if (!file) throw new Error("File not found");
+
+    // Create new file data with copied suffix
+    const newFileData = {
+      ...file.data,
+      name: `${file.data.name} (copy)`,
+      parent: targetParentId === null ? "root" : targetParentId,
+      createdAt: new Date()
+    };
+
+    // Add new file to Firestore
+    const fileRef = await fire.firestore().collection("files").add(newFileData);
+
+    // Dispatch to Redux
+    dispatch({
+      type: types.CREATE_FILE,
+      payload: {
+        data: newFileData,
+        docId: fileRef.id
+      }
+    });
+
+    dispatch(setLoading(false));
+    return fileRef.id;
+  } catch (error) {
+    console.error("Error copying file:", error);
     dispatch(setLoading(false));
     throw error;
   }

@@ -97,9 +97,9 @@ const FileComponent = () => {
   const isTextFile = 
     fileType.includes('text') || 
     fileType.includes('application/json') ||
-    fileName.endsWith('.txt') ||
-    fileName.endsWith('.json') ||
-    fileName.endsWith('.md');
+    fileType.includes('application/javascript') ||
+    fileType.includes('application/xml') ||
+    fileName.match(/\.(txt|json|js|jsx|ts|tsx|md|css|scss|html|xml|yml|yaml|ini|conf|sh|bat|py|java|cpp|c|h|cs|php|rb|pl|sql)$/i);
 
   return (
     <div className="col-md-12 px-3 py-2">
