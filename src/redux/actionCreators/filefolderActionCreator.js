@@ -126,8 +126,8 @@ export const getFolders = (userId) => async (dispatch) => {
   try {
     dispatch(setLoading(true));
     const folders = await fire
-      .firestore()
-      .collection("folders")
+    .firestore()
+    .collection("folders")
       .where("userId", "==", userId)
       .get();
 
@@ -385,7 +385,7 @@ export const copyFolder = (folderId, targetParentId) => async (dispatch, getStat
     const newFolderData = {
       ...folder.data,
       name: `${folder.data.name} (copy)`,
-      parent: targetParentId,
+      parent: targetParentId === null ? "root" : targetParentId,
       createdAt: new Date()
     };
 
@@ -423,7 +423,7 @@ export const copyFile = (fileId, targetParentId) => async (dispatch, getState) =
     const newFileData = {
       ...file.data,
       name: `${file.data.name} (copy)`,
-      parent: targetParentId,
+      parent: targetParentId === null ? "root" : targetParentId,
       createdAt: new Date()
     };
 

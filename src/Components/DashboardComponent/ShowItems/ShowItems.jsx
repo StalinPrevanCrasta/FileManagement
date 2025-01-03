@@ -44,31 +44,39 @@ const ShowItems = ({ title, items, type, selectedItems, setSelectedItems }) => {
             if (clipboardItems?.length > 0) {
               e.preventDefault();
               
-              // Get the target folder - use 'root' if we're in the root directory
-              const targetFolder = currentFolder || 'root';
+              // Get the target folder - use null for root directory
+              const targetFolder = currentFolder || null;
               
-              // Paste items to current folder
-              for (const item of clipboardItems) {
-                if (operation === 'copy') {
-                  // Copy operation
-                  if (item.type === 'folder') {
-                    await dispatch(copyFolder(item.docId, targetFolder));
-                  } else {
-                    await dispatch(copyFile(item.docId, targetFolder));
-                  }
-                } else if (operation === 'cut') {
-                  // Move operation (cut)
-                  if (item.type === 'folder') {
-                    await dispatch(moveFolder(item.docId, targetFolder));
-                  } else {
-                    await dispatch(moveFile(item.docId, targetFolder));
+              try {
+                // Paste items to current folder
+                for (const item of clipboardItems) {
+                  if (operation === 'copy') {
+                    // Copy operation
+                    if (item.type === 'folder') {
+                      await dispatch(copyFolder(item.docId, targetFolder));
+                    } else {
+                      await dispatch(copyFile(item.docId, targetFolder));
+                    }
+                  } else if (operation === 'cut') {
+                    // Move operation (cut)
+                    if (item.type === 'folder') {
+                      await dispatch(moveFolder(item.docId, targetFolder));
+                    } else {
+                      await dispatch(moveFile(item.docId, targetFolder));
+                    }
                   }
                 }
+                
+                // Only clear clipboard for cut operations
+                if (operation === 'cut') {
+                  localStorage.removeItem('clipboardItems');
+                }
+                setSelectedItems([]);
+                alert(`Items ${operation}ed successfully`);
+              } catch (error) {
+                console.error('Error during paste operation:', error);
+                alert('Failed to paste items. Please try again.');
               }
-              
-              localStorage.removeItem('clipboardItems');
-              setSelectedItems([]);
-              alert(`Items ${operation}ed successfully`);
             }
             break;
 
