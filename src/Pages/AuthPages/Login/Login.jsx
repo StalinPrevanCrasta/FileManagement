@@ -17,7 +17,7 @@ const Login = () => {
     title: {
       fontSize: '3rem',
       fontWeight: 'bold',
-      color: '#BB86FC',
+      color: '#ffffff',
       marginBottom: '2rem',
       textShadow: '0 0 10px #BB86FC, 0 0 20px #BB86FC, 0 0 30px #BB86FC',
     },
@@ -36,12 +36,9 @@ const Login = () => {
       maxWidth: '500px',
     },
     link: {
-      color: '#03DAC6',
+      color: '#ffffff', // White color for the "Login" link text
       textDecoration: 'none',
       fontWeight: 'bold',
-    },
-    linkHover: {
-      color: '#BB86FC',
     },
   };
 
@@ -56,8 +53,6 @@ const Login = () => {
             <Link 
               to="/register" 
               style={styles.link}
-              onMouseOver={(e) => (e.target.style.color = styles.linkHover.color)}
-              onMouseOut={(e) => (e.target.style.color = styles.link.color)}
             >
               Register
             </Link>
@@ -68,4 +63,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Login;  
