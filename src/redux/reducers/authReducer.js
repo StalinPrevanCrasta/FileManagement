@@ -2,7 +2,7 @@ import * as types from '../actionsTypes/authActionTypes';
 
 const initialState = {
     isAuthenticated: false,
-    user: {},
+    user: null,
 };
 
 const authReducer = (state = initialState, action) => {
@@ -17,7 +17,7 @@ const authReducer = (state = initialState, action) => {
             return {
                 ...state,
                 isAuthenticated: false,
-                user: {},
+                user: null,
             };
         default:
             return state;

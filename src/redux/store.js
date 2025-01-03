@@ -2,7 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './reducers/authReducer';
 import fileFolderReducer from './reducers/fileFolderReducer';
 
-export const store = configureStore({
+const store = configureStore({
   reducer: {
     auth: authReducer,
     filefolders: fileFolderReducer
@@ -12,3 +12,5 @@ export const store = configureStore({
       serializableCheck: false
     })
 });
+
+export default store;
