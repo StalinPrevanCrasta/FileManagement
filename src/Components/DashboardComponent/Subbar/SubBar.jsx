@@ -7,7 +7,7 @@ import { useDispatch } from "react-redux";
 import { deleteFile, deleteFolder } from "../../../redux/actionCreators/filefolderActionCreator";
 import CreateFolder from "../CreateFolder/CreateFolder";
 import UploadFile from "../UploadFile/UploadFile";
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 
 const SubBar = ({ setIsCreateFileModalOpen, selectedItems, setSelectedItems }) => {
   const location = useLocation();
@@ -15,7 +15,7 @@ const SubBar = ({ setIsCreateFileModalOpen, selectedItems, setSelectedItems }) =
   const { folderId } = useParams();
   const [isCreateFolderModalOpen, setIsCreateFolderModalOpen] = useState(false);
   const [isUploadFileModalOpen, setIsUploadFileModalOpen] = useState(false);
-  
+
   const handleDelete = () => {
     if (selectedItems.length === 0) {
       alert("Please select items to delete");
@@ -23,7 +23,7 @@ const SubBar = ({ setIsCreateFileModalOpen, selectedItems, setSelectedItems }) =
     }
 
     if (window.confirm(`Are you sure you want to delete ${selectedItems.length} item(s)?`)) {
-      selectedItems.forEach(item => {
+      selectedItems.forEach((item) => {
         if (item.type === "folder") {
           dispatch(deleteFolder(item.docId));
         } else {
@@ -36,7 +36,8 @@ const SubBar = ({ setIsCreateFileModalOpen, selectedItems, setSelectedItems }) =
 
   return (
     <>
-      <nav className="navbar navbar-expand-lg mt-2 navbar-light bg-white py-2 px-5">
+      <nav className="navbar navbar-expand-lg mt-2 navbar-light bg-black py-2 px-5">
+        <span className="navbar-brand">Docusphere</span>
         <nav className="ms-5" aria-label="breadcrumb">
           <ol className="breadcrumb d-flex align-items-center">
             <li className="breadcrumb-item">
@@ -50,7 +51,7 @@ const SubBar = ({ setIsCreateFileModalOpen, selectedItems, setSelectedItems }) =
 
         <ul className="navbar-nav ms-auto me-5">
           <li className="nav-item mx-2">
-            <button 
+            <button
               className="btn btn-outline-danger"
               onClick={handleDelete}
               disabled={selectedItems.length === 0}
@@ -60,7 +61,7 @@ const SubBar = ({ setIsCreateFileModalOpen, selectedItems, setSelectedItems }) =
             </button>
           </li>
           <li className="nav-item mx-2">
-            <button 
+            <button
               className="btn btn-outline-dark"
               onClick={() => setIsUploadFileModalOpen(true)}
             >
@@ -69,7 +70,7 @@ const SubBar = ({ setIsCreateFileModalOpen, selectedItems, setSelectedItems }) =
             </button>
           </li>
           <li className="nav-item mx-2">
-            <button 
+            <button
               className="btn btn-outline-dark"
               onClick={() => setIsCreateFileModalOpen(true)}
             >
@@ -78,7 +79,7 @@ const SubBar = ({ setIsCreateFileModalOpen, selectedItems, setSelectedItems }) =
             </button>
           </li>
           <li className="nav-item ms-2">
-            <button 
+            <button
               className="btn btn-outline-dark"
               onClick={() => setIsCreateFolderModalOpen(true)}
             >
