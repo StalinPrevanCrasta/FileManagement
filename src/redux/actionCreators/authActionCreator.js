@@ -2,6 +2,7 @@
 
 import * as types from "../actionsTypes/authActionTypes";
 import fire from "../../config/firebase";
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 
 // Action to log in user
 const loginUser = (payload) => {
@@ -115,4 +116,29 @@ export const checkIsLoggedIn = () => (dispatch) => {
       );
     }
   });
+};
+
+// Add Google Sign In action
+export const signInWithGoogle = (setSuccess) => async (dispatch) => {
+  try {
+    const provider = new GoogleAuthProvider();
+    const result = await signInWithPopup(fire.auth(), provider);
+    const user = result.user;
+
+    // Dispatch login action with user data
+    dispatch(
+      loginUser({
+        uid: user.uid,
+        email: user.email,
+        displayName: user.displayName,
+        photoURL: user.photoURL,
+      })
+    );
+    
+    setSuccess(true);
+  } catch (error) {
+    console.error("Error signing in with Google:", error);
+    alert(error.message);
+    setSuccess(false);
+  }
 };
