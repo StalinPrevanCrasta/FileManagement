@@ -69,7 +69,19 @@ const LoginForm = () => {
         />
       </div>
 
-      <button type="submit" className="btn btn-theme w-100">
+      <button
+        type="submit"
+        className="btn btn-theme w-100"
+        style={{
+          backgroundColor: "#6200EE", // Adjust the background color as needed
+          color: "#ffffff", // White text color
+          border: "none",
+          padding: "10px",
+          fontSize: "16px",
+          borderRadius: "5px",
+          cursor: "pointer",
+        }}
+      >
         Login
       </button>
     </form>
