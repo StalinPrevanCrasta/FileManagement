@@ -21,12 +21,12 @@ const UploadFile = ({ setIsUploadFileModalOpen }) => {
   const uploadToCloudinary = async (file) => {
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("upload_preset", "ml_default");
+    formData.append("upload_preset", "ml_default"); // Ensure this preset is whitelisted for unsigned uploads
     formData.append("folder", `file-manager/${user.uid}`);
 
     try {
       const response = await fetch(
-        "https://api.cloudinary.com/v1_1/dfrhhnpxv/upload",
+        `https://api.cloudinary.com/v1_1/dm3itgnqr/upload`, // Ensure this is your Cloudinary cloud name
         {
           method: "POST",
           body: formData,

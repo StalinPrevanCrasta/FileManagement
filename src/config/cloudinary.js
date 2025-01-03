@@ -1,8 +1,8 @@
 import { Cloudinary } from '@cloudinary/url-gen';
 
 const cloudinaryConfig = {
-  cloudName: 'dfrhhnpxv',
-  uploadPreset: 'ml_default',
+  cloudName: 'dm3itgnqr',
+  uploadPreset: 'ml_default', // Ensure this preset is whitelisted for unsigned uploads
   folder: 'file-manager'
 };
 
@@ -12,4 +12,4 @@ export const cld = new Cloudinary({
   }
 });
 
-export default cloudinaryConfig; 
+export default cloudinaryConfig;
