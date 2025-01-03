@@ -16,17 +16,6 @@ const FileComponent = () => {
 
   const currentFile = userFiles.find(file => file.docId === fileId);
 
-  const getProxiedUrl = (url) => {
-    if (!url) return '';
-    try {
-      const firebaseUrl = new URL(url);
-      return `/storage${firebaseUrl.pathname}${firebaseUrl.search}`;
-    } catch (e) {
-      console.error('Error parsing URL:', e);
-      return url;
-    }
-  };
-
   // Load content when component mounts or file changes
   useEffect(() => {
     if (currentFile?.data) {
@@ -90,7 +79,7 @@ const FileComponent = () => {
     return <div className="text-center mt-5">File not found</div>;
   }
 
-  const fileUrl = getProxiedUrl(currentFile.data.url);
+  const fileUrl = currentFile.data.url;
   const fileType = currentFile.data.type || '';
   const fileName = currentFile.data.name || '';
 

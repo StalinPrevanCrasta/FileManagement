@@ -26,7 +26,7 @@ const UploadFile = ({ setIsUploadFileModalOpen }) => {
 
     try {
       const response = await fetch(
-        "https://api.cloudinary.com/v1_1/dm3itgnqr/upload",
+        `https://api.cloudinary.com/v1_1/dm3itgnqr/upload`, // Ensure this is your Cloudinary cloud name
         {
           method: "POST",
           body: formData,
