@@ -4,9 +4,12 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import { Route, Routes } from "react-router-dom";
-import  {Login, Register, Homepage, DashboardPage} from './Pages';
 import { useDispatch } from 'react-redux';
 import { checkIsLoggedIn } from './redux/actionCreators/authActionCreator';
+import Login from './Pages/AuthPages/Login/Login';
+import Register from './Pages/AuthPages/Register/Register';
+import Homepage from './Pages/HomePage/Homepage';
+import DashboardPage from './Pages/DashboardPage/DashboardPage';
 
 const App = () => {
   const dispatch = useDispatch();
