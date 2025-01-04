@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './reducers/authReducer.js';
-import fileFolderReducer from './reducers/fileFolderReducer.js';
+import fileFolderReducer from './reducers/fileFolderReducer';
 
 const store = configureStore({
   reducer: {

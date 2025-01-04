@@ -8,7 +8,7 @@ import { useDispatch } from 'react-redux';
 import { checkIsLoggedIn } from './redux/actionCreators/authActionCreator';
 import Login from './Pages/AuthPages/Login/Login';
 import Register from './Pages/AuthPages/Register/Register';
-import Homepage from './Pages/HomePage/Homepage';
+import { Home } from './Pages/Home/Home';
 import DashboardPage from './Pages/DashboardPage/DashboardPage';
 
 const App = () => {
@@ -20,7 +20,7 @@ const App = () => {
   return (
     <div className='App'>
       <Routes>
-        <Route path="/" element={<Homepage />} />
+        <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login/>}/>
         <Route path="/register" element={<Register/>}/>
         <Route path="/dashboard/*" element={<DashboardPage/>}/>
