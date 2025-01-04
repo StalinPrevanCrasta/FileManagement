@@ -5,8 +5,17 @@
       "destination": "/index.html"
     }
   ],
-  "buildCommand": "yarn build",
-  "outputDirectory": "dist",
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
+    }
+  ],
   "framework": "vite",
-  "installCommand": "yarn install"
-} 
+  "buildCommand": "yarn build",
+  "installCommand": "yarn install",
+  "outputDirectory": "dist"
+}
