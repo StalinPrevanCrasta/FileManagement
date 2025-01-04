@@ -51,7 +51,9 @@ const HomeComponents = ({ selectedItems, setSelectedItems }) => {
   return (
     <div className="col-md-12 w-100">
       {isLoading ? (
-        <h1 className="display-1 my-5 text-center">Loading.....</h1>
+        <div className="d-flex justify-content-center align-items-center my-5">
+          <i className="fas fa-spinner fa-spin fa-3x"></i>
+        </div>
       ) : (
         <>
           <ShowItems 
