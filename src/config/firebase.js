@@ -5,13 +5,13 @@ import "firebase/compat/firestore";
 import "firebase/compat/storage";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyB7H1r4B-DZJuVIMsCJZ9V5gHc8xEuoh38",
-  authDomain: "file-management-system-3e572.firebaseapp.com",
-  projectId: "file-management-system-3e572",
-  storageBucket: "file-management-system-3e572.firebasestorage.app",
-  messagingSenderId: "206082207155",
-  appId: "1:206082207155:web:b216377adbf204895c2fc6",
-  measurementId: "G-C0NS79K17C"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain:import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
 // Initialize Firebase
