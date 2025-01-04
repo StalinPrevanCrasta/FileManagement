@@ -60,10 +60,6 @@ const DashboardPage = () => {
           box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
         }
 
-        .container-fluid h1, h2, h3, h4, h5, h6 {
-          color: #f39c12;
-        }
-
         .btn {
           background-color: #f39c12;
           border: none;

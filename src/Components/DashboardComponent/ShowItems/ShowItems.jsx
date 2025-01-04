@@ -1,21 +1,22 @@
+
 import React, { useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFolder, faFileAlt, faCheck } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 import { changeFolder, moveFolder, moveFile, copyFile, copyFolder } from "../../../redux/actionCreators/filefolderActionCreator";
 import { useDispatch, useSelector } from "react-redux";
-
-const ShowItems = ({ title, items, type, selectedItems, setSelectedItems }) => {
+const ShowItems = ({ items, type, selectedItems, setSelectedItems }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { currentFolder } = useSelector(state => state.filefolders);
+  
 
-  // Handle keyboard shortcuts
+
   useEffect(() => {
     const handleKeyDown = async (e) => {
       if (e.ctrlKey) {
         switch (e.key.toLowerCase()) {
-          case 'c': // Copy
+          case 'c':
             if (selectedItems.length > 0) {
               localStorage.setItem('clipboardItems', JSON.stringify({
                 items: selectedItems,
@@ -26,7 +27,7 @@ const ShowItems = ({ title, items, type, selectedItems, setSelectedItems }) => {
             }
             break;
 
-          case 'x': // Cut
+          case 'x':
             if (selectedItems.length > 0) {
               localStorage.setItem('clipboardItems', JSON.stringify({
                 items: selectedItems,
@@ -36,29 +37,24 @@ const ShowItems = ({ title, items, type, selectedItems, setSelectedItems }) => {
               alert('Items cut to clipboard');
             }
             break;
-          
-          case 'v': // Paste
+
+          case 'v':
             const clipboardData = JSON.parse(localStorage.getItem('clipboardItems') || '{}');
             const { items: clipboardItems, operation } = clipboardData;
-            
+
             if (clipboardItems?.length > 0) {
               e.preventDefault();
-              
-              // Get the target folder - use null for root directory
               const targetFolder = currentFolder || null;
-              
+
               try {
-                // Paste items to current folder
                 for (const item of clipboardItems) {
                   if (operation === 'copy') {
-                    // Copy operation
                     if (item.type === 'folder') {
                       await dispatch(copyFolder(item.docId, targetFolder));
                     } else {
                       await dispatch(copyFile(item.docId, targetFolder));
                     }
                   } else if (operation === 'cut') {
-                    // Move operation (cut)
                     if (item.type === 'folder') {
                       await dispatch(moveFolder(item.docId, targetFolder));
                     } else {
@@ -66,8 +62,7 @@ const ShowItems = ({ title, items, type, selectedItems, setSelectedItems }) => {
                     }
                   }
                 }
-                
-                // Only clear clipboard for cut operations
+
                 if (operation === 'cut') {
                   localStorage.removeItem('clipboardItems');
                 }
@@ -108,7 +103,6 @@ const ShowItems = ({ title, items, type, selectedItems, setSelectedItems }) => {
     }
   };
 
-  // Drag and drop handlers
   const handleDragStart = (e, item) => {
     e.dataTransfer.setData("itemId", item.docId);
     e.dataTransfer.setData("itemType", type);
@@ -130,7 +124,7 @@ const ShowItems = ({ title, items, type, selectedItems, setSelectedItems }) => {
   const handleDrop = (e, targetFolder) => {
     e.preventDefault();
     e.currentTarget.style.backgroundColor = "";
-    
+
     const itemId = e.dataTransfer.getData("itemId");
     const itemType = e.dataTransfer.getData("itemType");
 
@@ -145,9 +139,6 @@ const ShowItems = ({ title, items, type, selectedItems, setSelectedItems }) => {
 
   return (
     <div className="w-100">
-      <h4 className="text-center border-bottom py-2">
-        {title}
-      </h4>
       <div className="row gap-2 p-4 flex-wrap">
         {items.map((item) => {
           const itemName = item.data?.name || "Unnamed";
