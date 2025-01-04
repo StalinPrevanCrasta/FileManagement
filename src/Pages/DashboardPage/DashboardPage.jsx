@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getFolders, getFiles } from "../../redux/actionCreators/filefolderActionCreator";
 import { Route, Routes, useLocation } from "react-router-dom";
 import Navbar from "../../Components/DashboardComponent/Navbar/Navbar";
-import SubBar from "../../Components/DashboardComponent/Subbar/SubBar";
+import SubBar from "../../Components/DashboardComponent/SubBar/SubBar";
 import HomeComponents from "../../Components/DashboardComponent/HomeComponents/HomeComponents";
 import FolderComponent from "../../Components/DashboardComponent/FolderComponent/FolderComponent";
 import CreateFolder from "../../Components/DashboardComponent/CreateFolder/CreateFolder";
